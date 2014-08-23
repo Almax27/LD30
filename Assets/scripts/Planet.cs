@@ -4,63 +4,120 @@ using System.Collections.Generic;
 [RequireComponent(typeof(SphereCollider))]
 public class Planet : MonoBehaviour
 {
+	//class to describe connection between two worlds
+	[System.Serializable]
+	public class Connection
+	{
+		public enum Type
+		{
+			ATTACK,
+			REINFORCE,
+			NONE
+		}
 
-  public Planet connectedPlanet;    
+		public Connection(Planet _sender, Planet _reciever, float _rate, Type _type)
+		{
+			sender = _sender;
+			reciever = _reciever;
+			rate = _rate;
+			type = _type;
+		}
+
+		public Planet sender = null;
+		public Planet reciever = null;
+		public float rate = 0; //units per second
+		public Type type = Type.NONE;
+	}  
+
+	//class to describe the state of a resource and encapsulate it's growth
+	[System.Serializable]
+	public class Resource
+	{
+		public float max = 0;
+		public float current = 0;
+		public float baseGrowth = 0; //units per second
+		public float realGrowth = 0; //units per second
+
+		public void Update(float _dt)
+		{
+			current = Mathf.Min (max, current + realGrowth * _dt);
+		}
+	}
+
 	public int team = 0;
-	public float unitsPerSecond = 0;
-	public int maxUnits = 0;
-	public int currentUnits = 0;
-	public float aiTimeStep = 0;
-  public float connectionTimeStep = 0;
+	public Resource military = new Resource();
 
 	public float threatLevel = 0;
-
+	
 	public TextMesh debugText = null;
 	public Renderer debugRenderer = null;
-
-	protected float unitTick = 0;
-	protected float aiTick = 0;
-  protected float connectionTick = 0;
-
+	
+	protected List<Connection> incommingConnections = new List<Connection>();
+	protected Connection outgoingConnection = null;
+	public Connection OutgoingConnection { get { return outgoingConnection; } }
 
 	static List<Planet> allPlanets = new List<Planet>();
 
-	// Use this for initialization
-	void Start ()
+	void Awake()
 	{
-		aiTick = Random.Range(0.0f, aiTimeStep);
 		allPlanets.Add(this);
-
-		List<Planet> planets = GetNearbyPlanets();
-		UpdateThreatLevel(planets);
 	}
-
 	void OnDestroy()
 	{
 		allPlanets.Remove(this);
 	}
 
-	// Update is called once per frame
-	void FixedUpdate ()
+	// Use this for initialization
+	void Start ()
 	{
-		unitTick += Time.fixedDeltaTime;
-    connectionTick += Time.fixedDeltaTime;
-		if (unitTick > 1.0f/unitsPerSecond)
+		List<Planet> planets = GetNearbyPlanets();
+		UpdateThreatLevel(planets);
+	}
+
+	void Update()
+	{
+		List<Planet> planets = GetNearbyPlanets();
+		UpdateThreatLevel(planets);
+		UpdateResources(Time.fixedDeltaTime);
+
+		//handle 'death' and change to most agressive attacker's team
+		if(military.current < 0 && incommingConnections.Count > 0)
 		{
-			unitTick = 0;
-			SpawnUnit();
+			military.current = 0;
+			//sort in descending rate order
+			incommingConnections.Sort(delegate(Connection x, Connection y) 
+			                          {
+				return -x.rate.CompareTo(y.rate); //CompareTo sorts in ascending to we use '-' to reverse it
+			});
+			this.team = incommingConnections[0].sender.team;
+			this.SeverAllConnections();
 		}
 
-		aiTick += Time.fixedDeltaTime;
-		if(aiTick > aiTimeStep)
+		//DEBUG GUI STUFF
+		if(outgoingConnection != null)
 		{
-			aiTick = 0;
-			OnUpdateAI();
+			Vector3 senderPos = outgoingConnection.sender.transform.position;
+			Vector3 recieverPos = outgoingConnection.reciever.transform.position;
+			Vector3 lerpPoint = Vector3.Lerp(senderPos, recieverPos, 0.4f);
+			switch(outgoingConnection.type)
+			{
+			case Connection.Type.ATTACK:
+			{
+				Debug.DrawLine (senderPos, lerpPoint, Color.red);
+				break;
+			}
+			case Connection.Type.REINFORCE:
+			{
+				Debug.DrawLine (senderPos, lerpPoint, Color.blue);
+				break;
+			}
+			}
 		}
-
 		if(debugText)
 		{
-			debugText.text = "U:" + ((int)currentUnits) + "\nT: " + ((int)threatLevel);
+			debugText.text = "U:" + ((int)military.current) + "\n" +
+				"G: " + ((int)military.realGrowth) + "\n" +
+					"T: " + ((int)threatLevel) + "\n" ;
 		}
 		if(debugRenderer)
 		{
@@ -71,46 +128,13 @@ public class Planet : MonoBehaviour
 	[ContextMenu("RandomPlanet")]
 	void RandomisePlanet()
 	{
-		unitsPerSecond = Random.Range(5.0f, 10.0f);
-		maxUnits = Random.Range(50, 200);
-		currentUnits = (int)Random.Range(maxUnits * 0.25f, maxUnits * 0.5f);
-		aiTimeStep = Random.Range(0.0f, aiTimeStep);
+		military.baseGrowth = Random.Range(5.0f, 10.0f);
+		military.max = Random.Range(50, 200);
+		military.current = (int)Random.Range(military.max * 0.25f, military.max * 0.5f);
 	}
 
-	void SpawnUnit()
-	{
-		if(currentUnits < maxUnits)
-		{
-			currentUnits += 1;
-			if(currentUnits == maxUnits)
-			{
-				OnMaxUnitsReached();
-			}
-		}
-	}
-
-	void OnMaxUnitsReached()
-	{
-		Debug.Log("Capacity reached: " + currentUnits + "/" + maxUnits);
-	}
-
-	void OnUpdateAI()
-	{
-		List<Planet> planets = GetNearbyPlanets();
-		UpdateThreatLevel(planets);
-		if(Random.value > 0.5f)
-		{
-      if(connectionTick > connectionTimeStep)
-      {
-  			if(Random.value > 0.5f)
-  				TryAttack(planets);
-  			else
-  				TryReinforce(planets);
-      }
-		}
-	}
-
-	List<Planet> GetNearbyPlanets()
+	//TODO: optimise use, once per frame and access cache?
+	public List<Planet> GetNearbyPlanets()
 	{
 		List<Planet> planets = new List<Planet>();
 		SphereCollider sphere = collider as SphereCollider;
@@ -128,106 +152,108 @@ public class Planet : MonoBehaviour
 		return planets;
 	}
 
-	public int GetUnitsAvailable()
+	public float GetMilitaryAvailable()
 	{
-		int desired = (int)Mathf.Max (0.0f, (currentUnits - threatLevel));
-		return (int)(Mathf.Min (desired, currentUnits) * Random.Range(0.5f,0.6f)); //can't spend more than you have
+		float desired = Mathf.Max (0.0f, (military.current - threatLevel));
+		return Mathf.Min (desired, military.current) * Random.Range(0.5f,0.6f); //can't spend more than you have
 	}
 
-	public int GetUnitsRequired()
+	public float GetMilitaryRequired()
 	{
-		int desired = (int)Mathf.Max (0.0f, (threatLevel - currentUnits));
-		return Mathf.Min (desired, maxUnits - currentUnits); //can't require more than your capacity
+		float desired = (int)Mathf.Max (0.0f, (threatLevel - military.current));
+		return Mathf.Min (desired, military.max - military.current); //can't require more than your capacity
 	}
 
-
+	//update threat level based on given planet set
 	void UpdateThreatLevel(List<Planet> planets)
 	{
-		threatLevel = -currentUnits;
+		threatLevel = -military.current;
 		for(int i = 0; i < planets.Count; i++)
 		{
 			Planet planet = planets[i];
 			if(planet.team != this.team)
 			{
-				threatLevel += planet.currentUnits;
+				threatLevel += planet.military.current;
 			}
 			else
 			{
-				threatLevel -= planet.currentUnits * 0.8f;
+				threatLevel -= planet.military.current * 0.8f;
 			}
 		}
 	}
 
-	void TryReinforce(List<Planet> planets)
+	//create outgoing connection from this planet, will sever previous connection
+	//all connections must be made through this call to correctly maintain references
+	public void Connect(Planet _otherPlanet, float _rate, Connection.Type _type)
 	{
-		if(currentUnits > threatLevel)
+		//handle same target and type but new rate
+		if(outgoingConnection != null && 
+		   outgoingConnection.reciever == _otherPlanet && 
+		   outgoingConnection.type == _type && 
+		   outgoingConnection.rate != _rate)
 		{
-			Planet threatendPlanet = null;
-			float highestThreat = threatLevel;
-			for(int i = 0; i < planets.Count; i++)
-			{
-				Planet planet = planets[i];
-				if(planet.team == team && planet.threatLevel > highestThreat)
-				{
-					threatendPlanet = planet;
-					highestThreat = planet.threatLevel;
-				}
-			}
-			if(threatendPlanet)
-			{
-        if(connectedPlanet != threatendPlanet)
-        {
-          connectionTick = 0;
-          connectedPlanet = threatendPlanet;
-        }
-				Debug.Log("Reinforcing...");
-				int unitsRequired = threatendPlanet.GetUnitsRequired();
-				int unitsAvailable = GetUnitsAvailable();
-				int unitsToSpend = Mathf.Min(unitsAvailable, unitsRequired);
+			outgoingConnection.rate = _rate;
+			OnConnectionChanged();
+			return;
+		}
 
-				//apply
-				threatendPlanet.currentUnits += unitsToSpend;
-				currentUnits -= unitsToSpend;
-			}
+		//cleanup previous connection
+		SeverConnection();
+
+		//create new connection
+		this.outgoingConnection = new Connection(this, _otherPlanet, _rate, _type);
+		_otherPlanet.incommingConnections.Add(this.outgoingConnection);
+		OnConnectionChanged();
+	}
+
+	public void SeverConnection()
+	{
+		if(this.outgoingConnection != null)
+		{
+			this.outgoingConnection.reciever.incommingConnections.Remove(this.outgoingConnection);
+			this.outgoingConnection = null;
+			//TODO: destroy visualisation
 		}
 	}
 
-	void TryAttack(List<Planet> planets)
+	public void SeverAllConnections()
 	{
-		if(currentUnits > threatLevel)
+		SeverConnection();
+		List<Connection> temp = new List<Connection>(incommingConnections);
+		foreach(Connection connection in temp)
 		{
-			Planet bestTarget = null;
-			int lowestUnits = int.MaxValue;
-			for(int i = 0; i < planets.Count; i++)
+			connection.sender.SeverConnection();
+		}
+	}
+
+	void OnConnectionChanged()
+	{
+		//TODO: create visualisation if == null
+		//TODO: update visualisation variables
+	}
+
+	//update and apply resource growth
+	void UpdateResources(float _dt)
+	{
+		//calculate effective growth rate based on incomming connections
+		military.realGrowth = military.baseGrowth;
+		foreach(Connection connection in incommingConnections)
+		{
+			switch(connection.type)
 			{
-				Planet planet = planets[i];
-				if(planet.team != this.team && planet.currentUnits < lowestUnits)
-				{
-					bestTarget = planet;
-					lowestUnits = planet.currentUnits;
-				}
+			case Connection.Type.ATTACK:
+			{
+				military.realGrowth -= connection.rate;
+				break;
 			}
-			if(bestTarget)
+			case Connection.Type.REINFORCE:
 			{
-          if(connectedPlanet != bestTarget)
-          {
-            connectionTick = 0;
-            connectedPlanet = bestTarget;
-          }
-				Debug.Log("Attacking...");
-				int unitsToSpend = GetUnitsAvailable();
-
-				//apply
-				bestTarget.currentUnits -= unitsToSpend;
-				currentUnits -= unitsToSpend;
-
-				//change team and 'revive' units
-				if(bestTarget.currentUnits < 0)
-				{
-					bestTarget.team = team;
-					bestTarget.currentUnits *= -1;
-				}
+				military.realGrowth += connection.rate;
+				break;
+			}
 			}
 		}
+
+		military.Update(_dt);
 	}
 }
