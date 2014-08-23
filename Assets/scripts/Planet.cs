@@ -2,28 +2,31 @@
 using System.Collections.Generic;
 
 [RequireComponent(typeof(SphereCollider))]
-public class Planet : MonoBehaviour 
+public class Planet : MonoBehaviour
 {
-	
+
+  public Planet connectedPlanet;    
 	public int team = 0;
 	public float unitsPerSecond = 0;
 	public int maxUnits = 0;
 	public int currentUnits = 0;
 	public float aiTimeStep = 0;
+  public float connectionTimeStep = 0;
 
 	public float threatLevel = 0;
 
 	public TextMesh debugText = null;
 	public Renderer debugRenderer = null;
-	
+
 	protected float unitTick = 0;
 	protected float aiTick = 0;
+  protected float connectionTick = 0;
 
 
 	static List<Planet> allPlanets = new List<Planet>();
 
 	// Use this for initialization
-	void Start () 
+	void Start ()
 	{
 		aiTick = Random.Range(0.0f, aiTimeStep);
 		allPlanets.Add(this);
@@ -36,12 +39,13 @@ public class Planet : MonoBehaviour
 	{
 		allPlanets.Remove(this);
 	}
-	
+
 	// Update is called once per frame
-	void FixedUpdate () 
+	void FixedUpdate ()
 	{
 		unitTick += Time.fixedDeltaTime;
-		if (unitTick > 1.0f/unitsPerSecond) 
+    connectionTick += Time.fixedDeltaTime;
+		if (unitTick > 1.0f/unitsPerSecond)
 		{
 			unitTick = 0;
 			SpawnUnit();
@@ -56,7 +60,7 @@ public class Planet : MonoBehaviour
 
 		if(debugText)
 		{
-			debugText.text = "Units: " + currentUnits + "\nThreat: " + threatLevel;
+			debugText.text = "U:" + ((int)currentUnits) + "\nT: " + ((int)threatLevel);
 		}
 		if(debugRenderer)
 		{
@@ -96,10 +100,13 @@ public class Planet : MonoBehaviour
 		UpdateThreatLevel(planets);
 		if(Random.value > 0.5f)
 		{
-			if(Random.value > 0.5f)
-				TryAttack(planets);
-			else
-				TryReinforce(planets);
+      if(connectionTick > connectionTimeStep)
+      {
+  			if(Random.value > 0.5f)
+  				TryAttack(planets);
+  			else
+  				TryReinforce(planets);
+      }
 		}
 	}
 
@@ -168,6 +175,11 @@ public class Planet : MonoBehaviour
 			}
 			if(threatendPlanet)
 			{
+        if(connectedPlanet != threatendPlanet)
+        {
+          connectionTick = 0;
+          connectedPlanet = threatendPlanet;
+        }
 				Debug.Log("Reinforcing...");
 				int unitsRequired = threatendPlanet.GetUnitsRequired();
 				int unitsAvailable = GetUnitsAvailable();
@@ -197,7 +209,11 @@ public class Planet : MonoBehaviour
 			}
 			if(bestTarget)
 			{
-
+          if(connectedPlanet != bestTarget)
+          {
+            connectionTick = 0;
+            connectedPlanet = bestTarget;
+          }
 				Debug.Log("Attacking...");
 				int unitsToSpend = GetUnitsAvailable();
 
