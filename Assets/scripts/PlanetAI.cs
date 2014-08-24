@@ -28,7 +28,7 @@ public class PlanetAI : MonoBehaviour
 		if(connectionTick > connectionDuration)
 		{
 			connectionTick = 0;
-			if(Random.value > 0.5f) //randomly don't do anything
+			if(Random.value > 0.1f) //randomly don't do anything
 			{
 				UpdateConnection();
 			}
@@ -65,15 +65,17 @@ public class PlanetAI : MonoBehaviour
 			}
 			if(threatendPlanet)
 			{
-				Debug.Log("Reinforcing...");
-
 				float required = threatendPlanet.GetMilitaryRequired();
 				float available = thisPlanet.GetMilitaryAvailable();
 				float amountToSend = Mathf.Min(available, required);
 
 				float rate = amountToSend / connectionDuration;
-				
-				thisPlanet.Connect(threatendPlanet, rate, Planet.Connection.Type.REINFORCE);
+
+				int tier = GameConfig.GetBestConnectionTier(rate);
+				if(tier >= 0)
+				{
+					thisPlanet.Connect(threatendPlanet, tier, Planet.Connection.Type.REINFORCE);
+				}
 			}
 		}
 	}
@@ -95,12 +97,14 @@ public class PlanetAI : MonoBehaviour
 			}
 			if(bestTarget)
 			{
-				Debug.Log("Attacking...");
-
 				float amountToSend = thisPlanet.GetMilitaryAvailable();
 				float rate = amountToSend / connectionDuration;
 
-				thisPlanet.Connect(bestTarget, rate, Planet.Connection.Type.ATTACK);
+				int tier = GameConfig.GetBestConnectionTier(rate);
+				if(tier >= 0)
+				{
+					thisPlanet.Connect(bestTarget, tier, Planet.Connection.Type.ATTACK);
+				}
 			}
 		}
 	}

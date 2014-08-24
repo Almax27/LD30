@@ -42,10 +42,18 @@ public class PlayerController : MonoBehaviour
 			if(Physics.Raycast(ray, out hitInfo, float.MaxValue, planetLayerMask))
 			{
 				Planet planet = hitInfo.collider.GetComponent<Planet>();
+
+				//if released on a different planet, attempt connection
 				if(planet != selectedPlanet)
 				{
 					SetConnection(selectedPlanet, planet);
 				}
+				//if released on the same planet, cycle connection tier
+				else if(selectedPlanet.OutgoingConnection != null)
+				{
+					selectedPlanet.OutgoingConnection.IncrementTier();
+				}
+
 			}
 			UnselectPlanet();
 			isPlacingConnection = false;
@@ -101,11 +109,11 @@ public class PlayerController : MonoBehaviour
 		Debug.Log("Connection made: " + from.name + " -> " + to.name);
 		if(from.team != to.team)
 		{
-			from.Connect(to, 10, Planet.Connection.Type.ATTACK);
+			from.Connect(to, 0, Planet.Connection.Type.ATTACK);
 		}
 		else
 		{
-			from.Connect(to, 10, Planet.Connection.Type.REINFORCE);
+			from.Connect(to, 0, Planet.Connection.Type.REINFORCE);
 		}
 	}
 

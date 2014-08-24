@@ -14,18 +14,22 @@ public class Planet : MonoBehaviour
 			NONE
 		}
 
-		public Connection(Planet _sender, Planet _reciever, float _rate, Type _type)
+		public Connection(Planet _sender, Planet _reciever, int _tier, Type _type)
 		{
 			sender = _sender;
 			reciever = _reciever;
-			rate = _rate;
+			tier = _tier;
 			type = _type;
 		}
 
 		public Planet sender = null;
 		public Planet reciever = null;
-		public float rate = 0; //units per second
+		public int tier = 0;
 		public Type type = Type.NONE;
+
+		public float rate { get { return GameConfig.connectionTiers[tier]; } }
+
+		public void IncrementTier() { tier = tier + 1 % 3; }
 	}  
 
 	//class to describe the state of a resource and encapsulate it's growth
@@ -183,15 +187,15 @@ public class Planet : MonoBehaviour
 
 	//create outgoing connection from this planet, will sever previous connection
 	//all connections must be made through this call to correctly maintain references
-	public void Connect(Planet _otherPlanet, float _rate, Connection.Type _type)
+	public void Connect(Planet _otherPlanet, int _tier, Connection.Type _type)
 	{
 		//handle same target and type but new rate
 		if(outgoingConnection != null && 
 		   outgoingConnection.reciever == _otherPlanet && 
 		   outgoingConnection.type == _type && 
-		   outgoingConnection.rate != _rate)
+		   outgoingConnection.tier != _tier)
 		{
-			outgoingConnection.rate = _rate;
+			outgoingConnection.tier = _tier;
 			OnConnectionChanged();
 			return;
 		}
@@ -200,7 +204,7 @@ public class Planet : MonoBehaviour
 		SeverConnection();
 
 		//create new connection
-		this.outgoingConnection = new Connection(this, _otherPlanet, _rate, _type);
+		this.outgoingConnection = new Connection(this, _otherPlanet, _tier, _type);
 		_otherPlanet.incommingConnections.Add(this.outgoingConnection);
 		OnConnectionChanged();
 	}
