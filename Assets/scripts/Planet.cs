@@ -7,30 +7,21 @@ public class Planet : MonoBehaviour
 	[System.Serializable]
 	public class Connection
 	{
-		public enum Type
-		{
-			ATTACK,
-			REINFORCE,
-			NONE
-		}
-
-		public Connection(Planet _sender, Planet _reciever, int _tier, Type _type)
+		public Connection(Planet _sender, Planet _reciever, int _tier)
 		{
 			sender = _sender;
 			reciever = _reciever;
 			tier = _tier;
-			type = _type;
 		}
 
 		public Planet sender = null;
 		public Planet reciever = null;
 		public int tier = 0;
-		public Type type = Type.NONE;
 
 		public float rate { get { return GameConfig.connectionTiers[tier]; } }
 
-		public void IncrementTier() { tier = tier + 1 % 3; }
-	}  
+		public void IncrementTier() { tier = (tier + 1) % 3; }
+	}
 
 	//class to describe the state of a resource and encapsulate it's growth
 	[System.Serializable]
@@ -122,19 +113,15 @@ public class Planet : MonoBehaviour
 			Vector3 senderPos = outgoingConnection.sender.transform.position;
 			Vector3 recieverPos = outgoingConnection.reciever.transform.position;
 			Vector3 lerpPoint = Vector3.Lerp(senderPos, recieverPos, 0.4f);
-			switch(outgoingConnection.type)
-			{
-			case Connection.Type.ATTACK:
-			{
-				Debug.DrawLine (senderPos, lerpPoint, Color.red);
-				break;
-			}
-			case Connection.Type.REINFORCE:
-			{
-				Debug.DrawLine (senderPos, lerpPoint, Color.blue);
-				break;
-			}
-			}
+
+      if(outgoingConnection.sender.team == outgoingConnection.reciever.team)
+      {
+          Debug.DrawLine (senderPos, lerpPoint, Color.blue);
+      }
+      else
+      {
+        Debug.DrawLine (senderPos, lerpPoint, Color.red);
+      }
 		}
 		if(unitText)
 		{
@@ -215,12 +202,11 @@ public class Planet : MonoBehaviour
 
 	//create outgoing connection from this planet, will sever previous connection
 	//all connections must be made through this call to correctly maintain references
-	public void Connect(Planet _otherPlanet, int _tier, Connection.Type _type)
+	public void Connect(Planet _otherPlanet, int _tier)
 	{
 		//handle same target and type but new rate
 		if(outgoingConnection != null &&
 		   outgoingConnection.reciever == _otherPlanet &&
-		   outgoingConnection.type == _type &&
 		   outgoingConnection.tier != _tier)
 		{
 			outgoingConnection.tier = _tier;
@@ -232,7 +218,7 @@ public class Planet : MonoBehaviour
 		SeverConnection();
 
 		//create new connection
-		this.outgoingConnection = new Connection(this, _otherPlanet, _tier, _type);
+		this.outgoingConnection = new Connection(this, _otherPlanet, _tier);
 		_otherPlanet.incommingConnections.Add(this.outgoingConnection);
 		OnConnectionChanged();
 	}
@@ -267,31 +253,22 @@ public class Planet : MonoBehaviour
 	void UpdateResources(float _dt)
 	{
 		//calculate effective growth rate based on incomming connections
-		military.realGrowth = military.baseGrowth;
+    military.realGrowth = military.baseGrowth;
 		foreach(Connection connection in incommingConnections)
 		{
-			switch(connection.type)
-			{
-			case Connection.Type.ATTACK:
-			{
-				military.realGrowth -= connection.rate;
-				break;
-			}
-			case Connection.Type.REINFORCE:
-			{
-				military.realGrowth += connection.rate;
-				break;
-			}
-			}
+      if(connection.sender.team != connection.reciever.team)
+          military.realGrowth -= connection.rate;
+      else
+        military.realGrowth += connection.rate;
 		}
-	    resourceTick += Time.deltaTime;
-	    if(resourceTick > resourceInterval)
-	    {
-	    	resourceTick = 0;
+    resourceTick += Time.deltaTime;
+    if(resourceTick > resourceInterval)
+    {
+    	resourceTick = 0;
 			if(military.Update(resourceInterval))
 			{
 	        	textParticle.FireParticleText(military.realGrowth < 0 ? ((int)military.realGrowth).ToString():"+" +  ((int)military.realGrowth).ToString());
 			}
-	    }
+    }
 	}
 }

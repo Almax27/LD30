@@ -19,7 +19,7 @@ public class TextParticle : MonoBehaviour
   {
     animator.SetTrigger("PositiveGrowth");
   }
-  
+
   public void FireParticleText(string text)
   {
     textMesh.text = text;
