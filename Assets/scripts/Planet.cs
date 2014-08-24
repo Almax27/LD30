@@ -37,9 +37,18 @@ public class Planet : MonoBehaviour
 		public float baseGrowth = 0; //units per second
 		public float realGrowth = 0; //units per second
 
-		public void Update(float _dt)
+		public bool Update(float _dt)
 		{
-			current = Mathf.Min (max, current + realGrowth * _dt);
+			float units = Mathf.Min (max, current + realGrowth * _dt);
+      if(units == current)
+      {
+        return false;
+      }
+      else
+      {
+        current = units;
+        return true;
+      }
 		}
 	}
 #region public members
@@ -48,7 +57,7 @@ public class Planet : MonoBehaviour
 	public float threatLevel = 0;
 
 	public SphereCollider connectionArea = null;
-	public TextMesh debugText = null;
+	public TextMesh unitText = null;
   public TextParticle textParticle = null;
 	public Renderer debugRenderer = null;
 #endregion
@@ -122,10 +131,19 @@ public class Planet : MonoBehaviour
 			}
 			}
 		}
-		if(debugText)
+		if(unitText)
 		{
-			debugText.text = "U: " + ((int)military.current) + "  G: " + ((int)military.realGrowth) + "\n" +
-							 "C: " + (int)((outgoingConnection != null) ? outgoingConnection.rate : 0) + "  T: " + ((int)threatLevel) + "\n" ;
+      if((int)military.current == (int)military.max)
+      {
+          unitText.text = "[" + ((int)military.current).ToString() + "]";
+          unitText.color = Color.green;
+      }else
+      {
+        float percent = military.current/military.max;
+        unitText.text = ((int)military.current).ToString();
+        unitText.color = Color.Lerp(Color.red, Color.green, percent);
+      }
+
 		}
 		if(debugRenderer)
 		{
@@ -264,8 +282,8 @@ public class Planet : MonoBehaviour
     if(resourceTick > resourceInterval)
     {
       resourceTick = 0;
-      military.Update(1);
-      textParticle.FireParticleText(military.realGrowth < 0 ? ((int)military.realGrowth).ToString():"+" +  ((int)military.realGrowth).ToString());
+      if(military.Update(1))
+        textParticle.FireParticleText(military.realGrowth < 0 ? ((int)military.realGrowth).ToString():"+" +  ((int)military.realGrowth).ToString());
     }
 	}
 }
