@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 
-[RequireComponent(typeof(SphereCollider))]
 public class Planet : MonoBehaviour
 {
 	//class to describe connection between two worlds
@@ -48,6 +47,8 @@ public class Planet : MonoBehaviour
 	public Resource military = new Resource();
 
 	public float threatLevel = 0;
+
+	public SphereCollider connectionArea = null;
 	
 	public TextMesh debugText = null;
 	public Renderer debugRenderer = null;
@@ -115,9 +116,8 @@ public class Planet : MonoBehaviour
 		}
 		if(debugText)
 		{
-			debugText.text = "U:" + ((int)military.current) + "\n" +
-				"G: " + ((int)military.realGrowth) + "\n" +
-					"T: " + ((int)threatLevel) + "\n" ;
+			debugText.text = "U: " + ((int)military.current) + "  G: " + ((int)military.realGrowth) + "\n" +
+							 "C: " + (int)((outgoingConnection != null) ? outgoingConnection.rate : 0) + "  T: " + ((int)threatLevel) + "\n" ;
 		}
 		if(debugRenderer)
 		{
@@ -137,15 +137,14 @@ public class Planet : MonoBehaviour
 	public List<Planet> GetNearbyPlanets()
 	{
 		List<Planet> planets = new List<Planet>();
-		SphereCollider sphere = collider as SphereCollider;
 		for(int i = 0; i < allPlanets.Count; i++)
 		{
-			if(allPlanets[i] != this)
+			Planet planet = allPlanets[i];
+			if(planet != this)
 			{
-				SphereCollider otherSphere = allPlanets[i].collider as SphereCollider;
-				if(Vector3.Distance(otherSphere.transform.position, sphere.transform.position) < sphere.radius)
+				if(Vector3.Distance(planet.transform.position, this.transform.position) < connectionArea.radius)
 				{
-					planets.Add(otherSphere.GetComponent<Planet>());
+					planets.Add(planet);
 				}
 			}
 		}
