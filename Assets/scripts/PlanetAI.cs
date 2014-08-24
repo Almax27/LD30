@@ -2,23 +2,23 @@
 using System.Collections.Generic;
 
 [RequireComponent(typeof(Planet))]
-public class PlanetAI : MonoBehaviour 
+public class PlanetAI : MonoBehaviour
 {
 	Planet thisPlanet = null;
-	
+
 	public float connectionDuration = 0;
-	
+
 	protected float connectionTick = 0;
 
 	// Use this for initialization
-	void Start () 
+	void Start ()
 	{
-		thisPlanet = GetComponent<Planet>();	
+		thisPlanet = GetComponent<Planet>();
 		connectionTick = Random.Range(-connectionDuration, 0);
 	}
-	
+
 	// Update is called once per frame
-	void Update () 
+	void Update ()
 	{
 		if(connectionDuration < 0)
 		{
@@ -74,12 +74,12 @@ public class PlanetAI : MonoBehaviour
 				int tier = GameConfig.GetBestConnectionTier(rate);
 				if(tier >= 0)
 				{
-					thisPlanet.Connect(threatendPlanet, tier, Planet.Connection.Type.REINFORCE);
+					thisPlanet.Connect(threatendPlanet, tier);
 				}
 			}
 		}
 	}
-	
+
 	void TryAttack(List<Planet> planets)
 	{
 		if(thisPlanet.military.current > thisPlanet.threatLevel)
@@ -103,7 +103,7 @@ public class PlanetAI : MonoBehaviour
 				int tier = GameConfig.GetBestConnectionTier(rate);
 				if(tier >= 0)
 				{
-					thisPlanet.Connect(bestTarget, tier, Planet.Connection.Type.ATTACK);
+					thisPlanet.Connect(bestTarget, tier);
 				}
 			}
 		}

@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class PlayerController : MonoBehaviour 
+public class PlayerController : MonoBehaviour
 {
 	public LayerMask planetLayerMask;
 	public int team = 0;
@@ -13,13 +13,13 @@ public class PlayerController : MonoBehaviour
 	protected bool isPlacingConnection = false;
 
 	// Use this for initialization
-	void Start () 
+	void Start ()
 	{
-	
+
 	}
-	
+
 	// Update is called once per frame
-	void Update () 
+	void Update ()
 	{
 		if(Input.GetMouseButtonDown(0))
 		{
@@ -103,18 +103,18 @@ public class PlayerController : MonoBehaviour
 			selectedPlanet = null;
 		}
 	}
-	
+
 	void SetConnection(Planet from, Planet to)
 	{
 		//apply connection here
 		Debug.Log("Connection made: " + from.name + " -> " + to.name);
 		if(from.team != to.team)
 		{
-			from.Connect(to, 0, Planet.Connection.Type.ATTACK);
+			from.Connect(to, 0);
 		}
 		else
 		{
-			from.Connect(to, 0, Planet.Connection.Type.REINFORCE);
+			from.Connect(to, 0);
 		}
 	}
 
