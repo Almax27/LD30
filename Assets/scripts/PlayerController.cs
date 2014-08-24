@@ -5,6 +5,7 @@ public class PlayerController : MonoBehaviour
 {
 	public LayerMask planetLayerMask;
 	public int team = 0;
+	public Texture2D connectionLineTexture = null;
 
 	public Planet selectedPlanet = null;
 
@@ -127,7 +128,7 @@ public class PlayerController : MonoBehaviour
 			Vector3 mousePos = GUIUtility.ScreenToGUIPoint( Input.mousePosition );
 			mousePos.y = Camera.main.pixelHeight - mousePos.y;
 
-			GuiHelper.DrawLine(planetPos, mousePos, Color.white);
+			GuiHelper.DrawLine(planetPos, mousePos, connectionLineTexture, 100);
 		}
 	}
 }

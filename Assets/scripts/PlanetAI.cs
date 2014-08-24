@@ -63,7 +63,7 @@ public class PlanetAI : MonoBehaviour
 					highestThreat = planet.threatLevel;
 				}
 			}
-			if(threatendPlanet)
+			if(threatendPlanet != null)
 			{
 				float required = threatendPlanet.GetMilitaryRequired();
 				float available = thisPlanet.GetMilitaryAvailable();
@@ -95,7 +95,7 @@ public class PlanetAI : MonoBehaviour
 					lowestUnits = planet.military.current;
 				}
 			}
-			if(bestTarget)
+			if(bestTarget != null)
 			{
 				float amountToSend = thisPlanet.GetMilitaryAvailable();
 				float rate = amountToSend / connectionDuration;

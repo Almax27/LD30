@@ -60,7 +60,7 @@ public class Planet : MonoBehaviour
 	public int team = 0;
 	public Resource military = new Resource();
 	public float threatLevel = 0;
-
+	
 	public SphereCollider connectionArea = null;
 	public TextMesh unitText = null;
   	public TextParticle textParticle = null;
@@ -68,6 +68,7 @@ public class Planet : MonoBehaviour
 #endregion
 
 #region protected members
+	protected ConnectionController connectionController = null;
   	protected float resourceInterval = 1;
   	protected float resourceTick = 0;
 
@@ -84,6 +85,7 @@ public class Planet : MonoBehaviour
 	void Awake()
 	{
 		allPlanets.Add(this);
+		connectionController = GetComponent<ConnectionController>();
 	}
 	void OnDestroy()
 	{
@@ -224,7 +226,6 @@ public class Planet : MonoBehaviour
 		   outgoingConnection.tier != _tier)
 		{
 			outgoingConnection.tier = _tier;
-			OnConnectionChanged();
 			return;
 		}
 
@@ -234,7 +235,7 @@ public class Planet : MonoBehaviour
 		//create new connection
 		this.outgoingConnection = new Connection(this, _otherPlanet, _tier, _type);
 		_otherPlanet.incommingConnections.Add(this.outgoingConnection);
-		OnConnectionChanged();
+		connectionController.CreateConnection(outgoingConnection);
 	}
 
 	public void SeverConnection()
@@ -243,7 +244,7 @@ public class Planet : MonoBehaviour
 		{
 			this.outgoingConnection.reciever.incommingConnections.Remove(this.outgoingConnection);
 			this.outgoingConnection = null;
-			//TODO: destroy visualisation
+			connectionController.DestroyConnection();
 		}
 	}
 
@@ -255,12 +256,6 @@ public class Planet : MonoBehaviour
 		{
 			connection.sender.SeverConnection();
 		}
-	}
-
-	void OnConnectionChanged()
-	{
-		//TODO: create visualisation if == null
-		//TODO: update visualisation variables
 	}
 
 	//update and apply resource growth

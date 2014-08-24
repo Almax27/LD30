@@ -247,6 +247,18 @@ Prefab:
       propertyPath: m_Name
       value: red0
       objectReference: {fileID: 0}
+    - target: {fileID: 11400000, guid: 6c6a077c11ff2e84eb25200bfdc113c9, type: 2}
+      propertyPath: military.max
+      value: 100
+      objectReference: {fileID: 0}
+    - target: {fileID: 11400000, guid: 6c6a077c11ff2e84eb25200bfdc113c9, type: 2}
+      propertyPath: military.current
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 11400000, guid: 6c6a077c11ff2e84eb25200bfdc113c9, type: 2}
+      propertyPath: military.baseGrowth
+      value: 5
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 6c6a077c11ff2e84eb25200bfdc113c9, type: 2}
   m_RootGameObject: {fileID: 1872413590}
@@ -636,6 +648,7 @@ GameObject:
   - 114: {fileID: 445804251}
   - 135: {fileID: 445804250}
   - 54: {fileID: 445804249}
+  - 114: {fileID: 445804253}
   m_Layer: 8
   m_Name: red4
   m_TagString: Untagged
@@ -702,9 +715,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   team: 1
   military:
-    max: 169
-    current: 83
-    baseGrowth: 7.87497616
+    max: 100
+    current: 0
+    baseGrowth: 5
     realGrowth: 0
   threatLevel: 0
   connectionArea: {fileID: 1705567647}
@@ -724,6 +737,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   connectionDuration: 2
+--- !u!114 &445804253
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 11400008, guid: 6c6a077c11ff2e84eb25200bfdc113c9,
+    type: 2}
+  m_PrefabInternal: {fileID: 2092641750}
+  m_GameObject: {fileID: 445804247}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c172b5bfedfecd343bbbdd111c13cce9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  connectionLinePrefab: {fileID: 11400000, guid: 33987ccc1cf32114189f917ebe4b2436,
+    type: 2}
 --- !u!1 &477938927
 GameObject:
   m_ObjectHideFlags: 0
@@ -776,6 +803,7 @@ GameObject:
   - 114: {fileID: 541414344}
   - 135: {fileID: 541414343}
   - 54: {fileID: 541414342}
+  - 114: {fileID: 541414345}
   m_Layer: 8
   m_Name: playerPlanet4
   m_TagString: Untagged
@@ -842,15 +870,29 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   team: 0
   military:
-    max: 179
-    current: 52
-    baseGrowth: 9.59625912
+    max: 100
+    current: 0
+    baseGrowth: 5
     realGrowth: 0
   threatLevel: 0
   connectionArea: {fileID: 2010726287}
   unitText: {fileID: 1316064723}
   textParticle: {fileID: 1257759950}
   debugRenderer: {fileID: 831424646}
+--- !u!114 &541414345
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 11400006, guid: 12e0ac353b9cdb0419fcd2170d07eeef,
+    type: 2}
+  m_PrefabInternal: {fileID: 1466852029}
+  m_GameObject: {fileID: 541414340}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c172b5bfedfecd343bbbdd111c13cce9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  connectionLinePrefab: {fileID: 11400000, guid: 33987ccc1cf32114189f917ebe4b2436,
+    type: 2}
 --- !u!1 &542364787
 GameObject:
   m_ObjectHideFlags: 0
@@ -1023,6 +1065,7 @@ GameObject:
   - 114: {fileID: 588151678}
   - 135: {fileID: 588151677}
   - 54: {fileID: 588151676}
+  - 114: {fileID: 588151680}
   m_Layer: 8
   m_Name: red1
   m_TagString: Untagged
@@ -1089,9 +1132,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   team: 1
   military:
-    max: 105
-    current: 28
-    baseGrowth: 5.19956684
+    max: 100
+    current: 0
+    baseGrowth: 5
     realGrowth: 0
   threatLevel: 0
   connectionArea: {fileID: 229575041}
@@ -1111,6 +1154,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   connectionDuration: 2
+--- !u!114 &588151680
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 11400008, guid: 6c6a077c11ff2e84eb25200bfdc113c9,
+    type: 2}
+  m_PrefabInternal: {fileID: 662106034}
+  m_GameObject: {fileID: 588151674}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c172b5bfedfecd343bbbdd111c13cce9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  connectionLinePrefab: {fileID: 11400000, guid: 33987ccc1cf32114189f917ebe4b2436,
+    type: 2}
 --- !u!1 &592860893
 GameObject:
   m_ObjectHideFlags: 0
@@ -1123,6 +1180,7 @@ GameObject:
   - 114: {fileID: 592860897}
   - 135: {fileID: 592860896}
   - 54: {fileID: 592860895}
+  - 114: {fileID: 592860899}
   m_Layer: 8
   m_Name: red5
   m_TagString: Untagged
@@ -1189,9 +1247,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   team: 1
   military:
-    max: 160
-    current: 64
-    baseGrowth: 5.31752396
+    max: 100
+    current: 0
+    baseGrowth: 5
     realGrowth: 0
   threatLevel: 0
   connectionArea: {fileID: 844518236}
@@ -1211,6 +1269,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   connectionDuration: 2
+--- !u!114 &592860899
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 11400008, guid: 6c6a077c11ff2e84eb25200bfdc113c9,
+    type: 2}
+  m_PrefabInternal: {fileID: 1326234313}
+  m_GameObject: {fileID: 592860893}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c172b5bfedfecd343bbbdd111c13cce9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  connectionLinePrefab: {fileID: 11400000, guid: 33987ccc1cf32114189f917ebe4b2436,
+    type: 2}
 --- !u!1 &630113532
 GameObject:
   m_ObjectHideFlags: 0
@@ -1354,15 +1426,15 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 11400000, guid: 6c6a077c11ff2e84eb25200bfdc113c9, type: 2}
       propertyPath: military.max
-      value: 105
+      value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 11400000, guid: 6c6a077c11ff2e84eb25200bfdc113c9, type: 2}
       propertyPath: military.current
-      value: 28
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 11400000, guid: 6c6a077c11ff2e84eb25200bfdc113c9, type: 2}
       propertyPath: military.baseGrowth
-      value: 5.19956684
+      value: 5
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 6c6a077c11ff2e84eb25200bfdc113c9, type: 2}
@@ -1947,6 +2019,8 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 256
   team: 0
+  connectionLineTexture: {fileID: 2800000, guid: 7d5f5468bdc1588449a5d759451d2ffa,
+    type: 3}
   selectedPlanet: {fileID: 0}
 --- !u!4 &981722703
 Transform:
@@ -2005,15 +2079,15 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 11400000, guid: 6c6a077c11ff2e84eb25200bfdc113c9, type: 2}
       propertyPath: military.max
-      value: 102
+      value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 11400000, guid: 6c6a077c11ff2e84eb25200bfdc113c9, type: 2}
       propertyPath: military.current
-      value: 49
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 11400000, guid: 6c6a077c11ff2e84eb25200bfdc113c9, type: 2}
       propertyPath: military.baseGrowth
-      value: 5.28033018
+      value: 5
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 6c6a077c11ff2e84eb25200bfdc113c9, type: 2}
@@ -2032,6 +2106,7 @@ GameObject:
   - 114: {fileID: 1031031166}
   - 135: {fileID: 1031031165}
   - 54: {fileID: 1031031164}
+  - 114: {fileID: 1031031168}
   m_Layer: 8
   m_Name: red3
   m_TagString: Untagged
@@ -2098,9 +2173,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   team: 1
   military:
-    max: 102
-    current: 49
-    baseGrowth: 5.28033018
+    max: 100
+    current: 0
+    baseGrowth: 5
     realGrowth: 0
   threatLevel: 0
   connectionArea: {fileID: 1213896555}
@@ -2120,6 +2195,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   connectionDuration: 2
+--- !u!114 &1031031168
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 11400008, guid: 6c6a077c11ff2e84eb25200bfdc113c9,
+    type: 2}
+  m_PrefabInternal: {fileID: 996002822}
+  m_GameObject: {fileID: 1031031162}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c172b5bfedfecd343bbbdd111c13cce9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  connectionLinePrefab: {fileID: 11400000, guid: 33987ccc1cf32114189f917ebe4b2436,
+    type: 2}
 --- !u!1 &1081715735
 GameObject:
   m_ObjectHideFlags: 0
@@ -2223,15 +2312,15 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 11400000, guid: 12e0ac353b9cdb0419fcd2170d07eeef, type: 2}
       propertyPath: military.max
-      value: 146
+      value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 11400000, guid: 12e0ac353b9cdb0419fcd2170d07eeef, type: 2}
       propertyPath: military.current
-      value: 57
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 11400000, guid: 12e0ac353b9cdb0419fcd2170d07eeef, type: 2}
       propertyPath: military.baseGrowth
-      value: 8.22649384
+      value: 5
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 12e0ac353b9cdb0419fcd2170d07eeef, type: 2}
@@ -2925,15 +3014,15 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 11400000, guid: 6c6a077c11ff2e84eb25200bfdc113c9, type: 2}
       propertyPath: military.max
-      value: 160
+      value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 11400000, guid: 6c6a077c11ff2e84eb25200bfdc113c9, type: 2}
       propertyPath: military.current
-      value: 64
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 11400000, guid: 6c6a077c11ff2e84eb25200bfdc113c9, type: 2}
       propertyPath: military.baseGrowth
-      value: 5.31752396
+      value: 5
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 6c6a077c11ff2e84eb25200bfdc113c9, type: 2}
@@ -2985,15 +3074,15 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 11400000, guid: 12e0ac353b9cdb0419fcd2170d07eeef, type: 2}
       propertyPath: military.max
-      value: 160
+      value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 11400000, guid: 12e0ac353b9cdb0419fcd2170d07eeef, type: 2}
       propertyPath: military.current
-      value: 59
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 11400000, guid: 12e0ac353b9cdb0419fcd2170d07eeef, type: 2}
       propertyPath: military.baseGrowth
-      value: 5.44254971
+      value: 5
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 12e0ac353b9cdb0419fcd2170d07eeef, type: 2}
@@ -3011,6 +3100,7 @@ GameObject:
   - 114: {fileID: 1352545416}
   - 135: {fileID: 1352545415}
   - 54: {fileID: 1352545414}
+  - 114: {fileID: 1352545417}
   m_Layer: 8
   m_Name: playerPlanet2
   m_TagString: Untagged
@@ -3077,15 +3167,29 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   team: 0
   military:
-    max: 146
-    current: 57
-    baseGrowth: 8.22649384
+    max: 100
+    current: 0
+    baseGrowth: 5
     realGrowth: 0
   threatLevel: 0
   connectionArea: {fileID: 1234470694}
   unitText: {fileID: 823161841}
   textParticle: {fileID: 1648459589}
   debugRenderer: {fileID: 562655332}
+--- !u!114 &1352545417
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 11400006, guid: 12e0ac353b9cdb0419fcd2170d07eeef,
+    type: 2}
+  m_PrefabInternal: {fileID: 1089659237}
+  m_GameObject: {fileID: 1352545412}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c172b5bfedfecd343bbbdd111c13cce9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  connectionLinePrefab: {fileID: 11400000, guid: 33987ccc1cf32114189f917ebe4b2436,
+    type: 2}
 --- !u!1001 &1401197483
 Prefab:
   m_ObjectHideFlags: 0
@@ -3131,15 +3235,15 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 11400000, guid: 12e0ac353b9cdb0419fcd2170d07eeef, type: 2}
       propertyPath: military.max
-      value: 179
+      value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 11400000, guid: 12e0ac353b9cdb0419fcd2170d07eeef, type: 2}
       propertyPath: military.current
-      value: 51
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 11400000, guid: 12e0ac353b9cdb0419fcd2170d07eeef, type: 2}
       propertyPath: military.baseGrowth
-      value: 5.3066535
+      value: 5
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 12e0ac353b9cdb0419fcd2170d07eeef, type: 2}
@@ -3249,15 +3353,15 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 11400000, guid: 12e0ac353b9cdb0419fcd2170d07eeef, type: 2}
       propertyPath: military.max
-      value: 179
+      value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 11400000, guid: 12e0ac353b9cdb0419fcd2170d07eeef, type: 2}
       propertyPath: military.current
-      value: 52
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 11400000, guid: 12e0ac353b9cdb0419fcd2170d07eeef, type: 2}
       propertyPath: military.baseGrowth
-      value: 9.59625912
+      value: 5
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 12e0ac353b9cdb0419fcd2170d07eeef, type: 2}
@@ -3513,15 +3617,15 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 11400000, guid: 6c6a077c11ff2e84eb25200bfdc113c9, type: 2}
       propertyPath: military.max
-      value: 62
+      value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 11400000, guid: 6c6a077c11ff2e84eb25200bfdc113c9, type: 2}
       propertyPath: military.current
-      value: 28
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 11400000, guid: 6c6a077c11ff2e84eb25200bfdc113c9, type: 2}
       propertyPath: military.baseGrowth
-      value: 5.96084976
+      value: 5
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 6c6a077c11ff2e84eb25200bfdc113c9, type: 2}
@@ -3679,6 +3783,7 @@ GameObject:
   - 114: {fileID: 1664292585}
   - 135: {fileID: 1664292584}
   - 54: {fileID: 1664292583}
+  - 114: {fileID: 1664292586}
   m_Layer: 8
   m_Name: playerPlanet0
   m_TagString: Untagged
@@ -3745,15 +3850,29 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   team: 0
   military:
-    max: 179
-    current: 51
-    baseGrowth: 5.3066535
+    max: 100
+    current: 0
+    baseGrowth: 5
     realGrowth: 0
   threatLevel: 0
   connectionArea: {fileID: 1993391488}
   unitText: {fileID: 1155199351}
   textParticle: {fileID: 542364790}
   debugRenderer: {fileID: 1434815699}
+--- !u!114 &1664292586
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 11400006, guid: 12e0ac353b9cdb0419fcd2170d07eeef,
+    type: 2}
+  m_PrefabInternal: {fileID: 1401197483}
+  m_GameObject: {fileID: 1664292581}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c172b5bfedfecd343bbbdd111c13cce9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  connectionLinePrefab: {fileID: 11400000, guid: 33987ccc1cf32114189f917ebe4b2436,
+    type: 2}
 --- !u!1 &1691493871
 GameObject:
   m_ObjectHideFlags: 0
@@ -3766,6 +3885,7 @@ GameObject:
   - 114: {fileID: 1691493875}
   - 135: {fileID: 1691493874}
   - 54: {fileID: 1691493873}
+  - 114: {fileID: 1691493877}
   m_Layer: 8
   m_Name: red2
   m_TagString: Untagged
@@ -3832,9 +3952,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   team: 1
   military:
-    max: 62
-    current: 28
-    baseGrowth: 5.96084976
+    max: 100
+    current: 0
+    baseGrowth: 5
     realGrowth: 0
   threatLevel: 0
   connectionArea: {fileID: 213712461}
@@ -3854,6 +3974,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   connectionDuration: 2
+--- !u!114 &1691493877
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 11400008, guid: 6c6a077c11ff2e84eb25200bfdc113c9,
+    type: 2}
+  m_PrefabInternal: {fileID: 1614608274}
+  m_GameObject: {fileID: 1691493871}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c172b5bfedfecd343bbbdd111c13cce9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  connectionLinePrefab: {fileID: 11400000, guid: 33987ccc1cf32114189f917ebe4b2436,
+    type: 2}
 --- !u!1 &1705567645
 GameObject:
   m_ObjectHideFlags: 0
@@ -4023,6 +4157,7 @@ GameObject:
   - 114: {fileID: 1872413594}
   - 135: {fileID: 1872413593}
   - 54: {fileID: 1872413592}
+  - 114: {fileID: 1872413596}
   m_Layer: 8
   m_Name: red0
   m_TagString: Untagged
@@ -4089,9 +4224,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   team: 1
   military:
-    max: 79
-    current: 27
-    baseGrowth: 9.58451748
+    max: 100
+    current: 0
+    baseGrowth: 5
     realGrowth: 0
   threatLevel: 0
   connectionArea: {fileID: 477938929}
@@ -4111,6 +4246,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   connectionDuration: 2
+--- !u!114 &1872413596
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 11400008, guid: 6c6a077c11ff2e84eb25200bfdc113c9,
+    type: 2}
+  m_PrefabInternal: {fileID: 42378007}
+  m_GameObject: {fileID: 1872413590}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c172b5bfedfecd343bbbdd111c13cce9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  connectionLinePrefab: {fileID: 11400000, guid: 33987ccc1cf32114189f917ebe4b2436,
+    type: 2}
 --- !u!1 &1905314080
 GameObject:
   m_ObjectHideFlags: 0
@@ -4296,6 +4445,7 @@ GameObject:
   - 114: {fileID: 1992420207}
   - 135: {fileID: 1992420206}
   - 54: {fileID: 1992420205}
+  - 114: {fileID: 1992420208}
   m_Layer: 8
   m_Name: playerPlanet3
   m_TagString: Untagged
@@ -4362,15 +4512,29 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   team: 0
   military:
-    max: 160
-    current: 59
-    baseGrowth: 5.44254971
+    max: 100
+    current: 0
+    baseGrowth: 5
     realGrowth: 0
   threatLevel: 0
   connectionArea: {fileID: 1129851079}
   unitText: {fileID: 418944602}
   textParticle: {fileID: 1496617938}
   debugRenderer: {fileID: 1817781666}
+--- !u!114 &1992420208
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 11400006, guid: 12e0ac353b9cdb0419fcd2170d07eeef,
+    type: 2}
+  m_PrefabInternal: {fileID: 1349099429}
+  m_GameObject: {fileID: 1992420203}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c172b5bfedfecd343bbbdd111c13cce9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  connectionLinePrefab: {fileID: 11400000, guid: 33987ccc1cf32114189f917ebe4b2436,
+    type: 2}
 --- !u!1 &1993391486
 GameObject:
   m_ObjectHideFlags: 0
@@ -4453,15 +4617,15 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 11400000, guid: 12e0ac353b9cdb0419fcd2170d07eeef, type: 2}
       propertyPath: military.max
-      value: 53
+      value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 11400000, guid: 12e0ac353b9cdb0419fcd2170d07eeef, type: 2}
       propertyPath: military.current
-      value: 20
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 11400000, guid: 12e0ac353b9cdb0419fcd2170d07eeef, type: 2}
       propertyPath: military.baseGrowth
-      value: 7.30931664
+      value: 5
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 12e0ac353b9cdb0419fcd2170d07eeef, type: 2}
@@ -4622,6 +4786,7 @@ GameObject:
   - 114: {fileID: 2021429833}
   - 135: {fileID: 2021429832}
   - 54: {fileID: 2021429831}
+  - 114: {fileID: 2021429834}
   m_Layer: 8
   m_Name: playerPlanet1
   m_TagString: Untagged
@@ -4688,15 +4853,29 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   team: 0
   military:
-    max: 53
-    current: 20
-    baseGrowth: 7.30931664
+    max: 100
+    current: 0
+    baseGrowth: 5
     realGrowth: 0
   threatLevel: 0
   connectionArea: {fileID: 1209450941}
   unitText: {fileID: 665017610}
   textParticle: {fileID: 630113534}
   debugRenderer: {fileID: 18217274}
+--- !u!114 &2021429834
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 11400006, guid: 12e0ac353b9cdb0419fcd2170d07eeef,
+    type: 2}
+  m_PrefabInternal: {fileID: 2002484343}
+  m_GameObject: {fileID: 2021429829}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c172b5bfedfecd343bbbdd111c13cce9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  connectionLinePrefab: {fileID: 11400000, guid: 33987ccc1cf32114189f917ebe4b2436,
+    type: 2}
 --- !u!1 &2060143499
 GameObject:
   m_ObjectHideFlags: 0
@@ -4835,15 +5014,15 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 11400000, guid: 6c6a077c11ff2e84eb25200bfdc113c9, type: 2}
       propertyPath: military.max
-      value: 169
+      value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 11400000, guid: 6c6a077c11ff2e84eb25200bfdc113c9, type: 2}
       propertyPath: military.current
-      value: 83
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 11400000, guid: 6c6a077c11ff2e84eb25200bfdc113c9, type: 2}
       propertyPath: military.baseGrowth
-      value: 7.87497616
+      value: 5
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 6c6a077c11ff2e84eb25200bfdc113c9, type: 2}
