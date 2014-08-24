@@ -5,7 +5,7 @@ public class PlayerController : MonoBehaviour
 {
 	public LayerMask planetLayerMask;
 	public int team = 0;
-	public Texture2D connectionLineTexture = null;
+	public ConnectionLine connectionLine = null;
 
 	public Planet selectedPlanet = null;
 
@@ -66,7 +66,6 @@ public class PlayerController : MonoBehaviour
 			isPlacingConnection = true;
 		}
 
-		//draw ray from camera
 		if(Input.GetMouseButton(0))
 		{
 			Plane xzPlane = new Plane(Vector3.up, Vector3.zero);
@@ -79,9 +78,21 @@ public class PlayerController : MonoBehaviour
 			Ray mouseRay = Camera.main.ScreenPointToRay(Input.mousePosition);
 			xzPlane.Raycast(mouseRay, out mouseDist);
 
+			if(connectionLine != null && isPlacingConnection)
+			{
+				connectionLine.lineStart = selectedPlanet.transform.position;
+				connectionLine.lineEnd = mouseRay.GetPoint(mouseDist);
+			}
+
+			//debug
 			Debug.DrawLine(mouseDownRay.origin, mouseDownRay.GetPoint(mouseDownDist), Color.white);
 			Debug.DrawLine(mouseRay.origin, mouseRay.GetPoint(mouseDist), Color.white);
 			Debug.DrawLine(mouseDownRay.GetPoint(mouseDownDist), mouseRay.GetPoint(mouseDist), Color.white);
+		}
+
+		if(connectionLine != null)
+		{
+			connectionLine.gameObject.SetActive(isPlacingConnection);
 		}
 	}
 
@@ -118,6 +129,7 @@ public class PlayerController : MonoBehaviour
 		}
 	}
 
+	/*
 	//GUI space selection arrow
 	void OnGUI()
 	{
@@ -131,4 +143,5 @@ public class PlayerController : MonoBehaviour
 			GuiHelper.DrawLine(planetPos, mousePos, connectionLineTexture, 100);
 		}
 	}
+	*/
 }

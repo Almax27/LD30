@@ -14,6 +14,12 @@ AnimatorController:
     m_DefaultInt: 0
     m_DefaultBool: 0
     m_Controller: {fileID: 9100000}
+  - m_Name: NegativeGrowth
+    m_Type: 9
+    m_DefaultFloat: 0
+    m_DefaultInt: 0
+    m_DefaultBool: 0
+    m_Controller: {fileID: 9100000}
   m_AnimatorLayers:
   - serializedVersion: 3
     m_Name: Base Layer
@@ -40,6 +46,26 @@ Transition:
   m_Conditions:
   - m_ConditionMode: 1
     m_ConditionEvent: PositiveGrowth
+    m_EventTreshold: 0
+    m_ExitTime: .899999976
+  m_Atomic: 1
+  m_Solo: 0
+  m_Mute: 0
+  m_CanTransitionToSelf: 0
+--- !u!1101 &110105064
+Transition:
+  serializedVersion: 2
+  m_ObjectHideFlags: 3
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_Name: 
+  m_SrcState: {fileID: 0}
+  m_DstState: {fileID: 110235025}
+  m_TransitionDuration: .100000001
+  m_TransitionOffset: 0
+  m_Conditions:
+  - m_ConditionMode: 1
+    m_ConditionEvent: NegativeGrowth
     m_EventTreshold: 0
     m_ExitTime: .899999976
   m_Atomic: 1
@@ -79,10 +105,30 @@ Transition:
   m_TransitionOffset: .00200807839
   m_Conditions:
   - m_ConditionMode: 5
-    m_ConditionEvent: 
+    m_ConditionEvent: NegativeGrowth
     m_EventTreshold: 0
     m_ExitTime: 1.00258183
   m_Atomic: 0
+  m_Solo: 0
+  m_Mute: 0
+  m_CanTransitionToSelf: 0
+--- !u!1101 &110163567
+Transition:
+  serializedVersion: 2
+  m_ObjectHideFlags: 3
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_Name: 
+  m_SrcState: {fileID: 110235025}
+  m_DstState: {fileID: 110219471}
+  m_TransitionDuration: .214285716
+  m_TransitionOffset: 0
+  m_Conditions:
+  - m_ConditionMode: 5
+    m_ConditionEvent: NegativeGrowth
+    m_EventTreshold: 0
+    m_ExitTime: 1
+  m_Atomic: 1
   m_Solo: 0
   m_Mute: 0
   m_CanTransitionToSelf: 0
@@ -92,7 +138,7 @@ State:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_Name: PositiveGrowth
-  m_Speed: 1.5
+  m_Speed: 1
   m_CycleOffset: 0
   m_Motions:
   - {fileID: 7400000, guid: f4a47e8a623521b43a553c7af39d7cbe, type: 2}
@@ -112,7 +158,22 @@ State:
   m_Motions:
   - {fileID: 7400000, guid: ae4637b8d79e08a4e94e5fc8f1f85621, type: 2}
   m_ParentStateMachine: {fileID: 110700000}
-  m_Position: {x: 192, y: -36, z: 0}
+  m_Position: {x: 168, y: 48, z: 0}
+  m_IKOnFeet: 0
+  m_Mirror: 0
+  m_Tag: 
+--- !u!1102 &110235025
+State:
+  m_ObjectHideFlags: 3
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_Name: NegativeGrowth
+  m_Speed: 1
+  m_CycleOffset: 0
+  m_Motions:
+  - {fileID: 7400000, guid: d8d60d65ca4999d4ba7ef753b1dbaf5a, type: 2}
+  m_ParentStateMachine: {fileID: 110700000}
+  m_Position: {x: 24, y: 132, z: 0}
   m_IKOnFeet: 0
   m_Mirror: 0
   m_Tag: 
@@ -127,17 +188,26 @@ StateMachine:
   m_States:
   - {fileID: 110200000}
   - {fileID: 110219471}
+  - {fileID: 110235025}
   m_ChildStateMachine: []
   m_ChildStateMachinePosition: []
   m_OrderedTransitions:
+    data:
+      first: {fileID: 110235025}
+      second:
+      - {fileID: 110163567}
+    data:
+      first: {fileID: 0}
+      second:
+      - {fileID: 110106563}
+      - {fileID: 110105064}
     data:
       first: {fileID: 110200000}
       second:
       - {fileID: 110107899}
     data:
-      first: {fileID: 0}
-      second:
-      - {fileID: 110106563}
+      first: {fileID: 110219471}
+      second: []
   m_MotionSetCount: 1
-  m_AnyStatePosition: {x: 36, y: 60, z: 0}
+  m_AnyStatePosition: {x: -72, y: 60, z: 0}
   m_ParentStateMachinePosition: {x: 800, y: 20, z: 0}

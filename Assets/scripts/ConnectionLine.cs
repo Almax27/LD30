@@ -31,20 +31,32 @@ public class ConnectionLine : MonoBehaviour
 		animTick += isConnected ? Time.deltaTime : -Time.deltaTime;
 		animTick = Mathf.Clamp(animTick, 0, animDuration);
 
-		if(animTick > 0 && animTick < animDuration)
+		//if(animTick > 0 && animTick < animDuration)
 		{
 			float t = animTick / animDuration;
 			line.SetPosition(0, lineStart);
 			line.SetPosition(1, Vector3.Lerp(lineStart, lineEnd, t));
 		}
 
-		Vector2 textureOffset_1 = line.material.GetTextureOffset("_FlowTex1");
-		textureOffset_1.x -= textureAnimRate_1 * Time.deltaTime;
-		line.material.SetTextureOffset("_FlowTex1", textureOffset_1);
+		if(connection != null)
+		{
+			Vector2 textureOffset_1 = line.material.GetTextureOffset("_FlowTex1");
+			textureOffset_1.x -= textureAnimRate_1 * Time.deltaTime * (connection.tier+0.5f);
+			line.material.SetTextureOffset("_FlowTex1", textureOffset_1);
+			
+			Vector2 textureOffset_2 = line.material.GetTextureOffset("_FlowTex2");
+			textureOffset_2.x -= textureAnimRate_2 * Time.deltaTime * (connection.tier+0.5f);
+			line.material.SetTextureOffset("_FlowTex2", textureOffset_2);
 
-		Vector2 textureOffset_2 = line.material.GetTextureOffset("_FlowTex2");
-		textureOffset_2.x -= textureAnimRate_2 * Time.deltaTime;
-		line.material.SetTextureOffset("_FlowTex2", textureOffset_2);
+			if(connection.sender.team == connection.reciever.team)
+			{
+				line.material.color = Color.green;
+			}
+			else
+			{
+				line.material.color = Color.red;
+			}
+		}
 	}
 
 	//perform sever animation and destroy self
@@ -69,14 +81,9 @@ public class ConnectionLine : MonoBehaviour
 		lineEnd = connection.reciever.transform.position;
 		isConnected = true;
 
-		if(_connection.sender.team == _connection.reciever.team)
-		{
-			line.material.color = Color.green;
-		}
-		else
-		{
-			line.material.color = Color.red;
-		}
+		Vector3 offset = Vector3.Cross((lineEnd - lineStart).normalized, Vector3.up);
+		lineStart += offset * 0.2f;
+		lineEnd += offset * 0.2f;
 
 	}
 

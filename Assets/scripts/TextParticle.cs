@@ -20,9 +20,20 @@ public class TextParticle : MonoBehaviour
     animator.SetTrigger("PositiveGrowth");
   }
 
-  public void FireParticleText(string text)
-  {
-    textMesh.text = text;
-    animator.SetTrigger("PositiveGrowth");
-  }
+	public void FirePositiveText(string text)
+	{
+		textMesh.text = text;
+		animator.SetTrigger("PositiveGrowth");
+	}
+	public void FireNegatveText(string text)
+	{
+		textMesh.text = text;
+		animator.SetTrigger("NegativeGrowth");
+	}
+	public void FireBaseText(string text)
+	{
+		textMesh.text = text;
+		animator.SetTrigger("PositiveGrowth");
+	}
+
 }

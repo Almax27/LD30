@@ -3,7 +3,7 @@ using System.Collections;
 
 public class GameConfig
 {
-	public static readonly float[] connectionTiers = {10.0f,25.0f,50.0f};
+	public static readonly float[] connectionTiers = {5.0f,10.0f};
 
 	//returns best fit tier (floored), returns -1 if no valid tier
 	public static int GetBestConnectionTier(float _rate)

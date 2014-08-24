@@ -1,11 +1,11 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 
-[RequireComponent(typeof(Planet))]
 public class PlanetAI : MonoBehaviour
 {
 	Planet thisPlanet = null;
 
+	public int team = 0;
 	public float connectionDuration = 0;
 
 	protected float connectionTick = 0;
@@ -28,9 +28,16 @@ public class PlanetAI : MonoBehaviour
 		if(connectionTick > connectionDuration)
 		{
 			connectionTick = 0;
-			if(Random.value > 0.1f) //randomly don't do anything
+			for(int i = 0; i < Planet.AllPlanets.Count; i++)
 			{
-				UpdateConnection();
+				thisPlanet = Planet.AllPlanets[i];
+				if(thisPlanet.team == team)
+				{	
+					if(Random.value < 0.2f) //randomly don't do anything
+					{
+						UpdateConnection();
+					}
+				}
 			}
 		}
 	}
@@ -77,6 +84,10 @@ public class PlanetAI : MonoBehaviour
 					thisPlanet.Connect(threatendPlanet, tier);
 				}
 			}
+			else
+			{
+				thisPlanet.SeverConnection();
+			}
 		}
 	}
 
@@ -105,6 +116,10 @@ public class PlanetAI : MonoBehaviour
 				{
 					thisPlanet.Connect(bestTarget, tier);
 				}
+			}
+			else
+			{
+				thisPlanet.SeverConnection();
 			}
 		}
 	}
