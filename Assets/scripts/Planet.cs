@@ -26,7 +26,7 @@ public class Planet : MonoBehaviour
 		public Planet reciever = null;
 		public float rate = 0; //units per second
 		public Type type = Type.NONE;
-	}  
+	}
 
 	//class to describe the state of a resource and encapsulate it's growth
 	[System.Serializable]
@@ -42,20 +42,28 @@ public class Planet : MonoBehaviour
 			current = Mathf.Min (max, current + realGrowth * _dt);
 		}
 	}
-
+#region public members
 	public int team = 0;
 	public Resource military = new Resource();
-
 	public float threatLevel = 0;
 
 	public SphereCollider connectionArea = null;
-	
 	public TextMesh debugText = null;
+  public TextParticle textParticle = null;
 	public Renderer debugRenderer = null;
-	
+#endregion
+
+#region protected members
+  protected float resourceInterval = 1;
+  protected float resourceTick = 0;
+
 	protected List<Connection> incommingConnections = new List<Connection>();
 	protected Connection outgoingConnection = null;
+#endregion
+
+#region public properties
 	public Connection OutgoingConnection { get { return outgoingConnection; } }
+#endregion
 
 	static List<Planet> allPlanets = new List<Planet>();
 
@@ -73,20 +81,20 @@ public class Planet : MonoBehaviour
 	{
 		List<Planet> planets = GetNearbyPlanets();
 		UpdateThreatLevel(planets);
+    resourceTick = Random.Range(0.0f, 0.9f);
 	}
 
 	void Update()
 	{
 		List<Planet> planets = GetNearbyPlanets();
 		UpdateThreatLevel(planets);
-		UpdateResources(Time.fixedDeltaTime);
-
+		UpdateResources(Time.deltaTime);
 		//handle 'death' and change to most agressive attacker's team
 		if(military.current < 0 && incommingConnections.Count > 0)
 		{
 			military.current = 0;
 			//sort in descending rate order
-			incommingConnections.Sort(delegate(Connection x, Connection y) 
+			incommingConnections.Sort(delegate(Connection x, Connection y)
 			                          {
 				return -x.rate.CompareTo(y.rate); //CompareTo sorts in ascending to we use '-' to reverse it
 			});
@@ -186,9 +194,9 @@ public class Planet : MonoBehaviour
 	public void Connect(Planet _otherPlanet, float _rate, Connection.Type _type)
 	{
 		//handle same target and type but new rate
-		if(outgoingConnection != null && 
-		   outgoingConnection.reciever == _otherPlanet && 
-		   outgoingConnection.type == _type && 
+		if(outgoingConnection != null &&
+		   outgoingConnection.reciever == _otherPlanet &&
+		   outgoingConnection.type == _type &&
 		   outgoingConnection.rate != _rate)
 		{
 			outgoingConnection.rate = _rate;
@@ -252,7 +260,12 @@ public class Planet : MonoBehaviour
 			}
 			}
 		}
-
-		military.Update(_dt);
+    resourceTick += Time.deltaTime;
+    if(resourceTick > resourceInterval)
+    {
+      resourceTick = 0;
+      military.Update(1);
+      textParticle.FireParticleText(military.realGrowth < 0 ? ((int)military.realGrowth).ToString():"+" +  ((int)military.realGrowth).ToString());
+    }
 	}
 }
