@@ -1,24 +1,24 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 
-[RequireComponent(typeof(Planet))]
-public class PlanetAI : MonoBehaviour 
+public class PlanetAI : MonoBehaviour
 {
 	Planet thisPlanet = null;
-	
+
+	public int team = 0;
 	public float connectionDuration = 0;
-	
+
 	protected float connectionTick = 0;
 
 	// Use this for initialization
-	void Start () 
+	void Start ()
 	{
-		thisPlanet = GetComponent<Planet>();	
+		thisPlanet = GetComponent<Planet>();
 		connectionTick = Random.Range(-connectionDuration, 0);
 	}
-	
+
 	// Update is called once per frame
-	void Update () 
+	void Update ()
 	{
 		if(connectionDuration < 0)
 		{
@@ -28,9 +28,16 @@ public class PlanetAI : MonoBehaviour
 		if(connectionTick > connectionDuration)
 		{
 			connectionTick = 0;
-			if(Random.value > 0.5f) //randomly don't do anything
+			for(int i = 0; i < Planet.AllPlanets.Count; i++)
 			{
-				UpdateConnection();
+				thisPlanet = Planet.AllPlanets[i];
+				if(thisPlanet.team == team)
+				{	
+					if(Random.value < 0.2f) //randomly don't do anything
+					{
+						UpdateConnection();
+					}
+				}
 			}
 		}
 	}
@@ -63,21 +70,27 @@ public class PlanetAI : MonoBehaviour
 					highestThreat = planet.threatLevel;
 				}
 			}
-			if(threatendPlanet)
+			if(threatendPlanet != null)
 			{
-				Debug.Log("Reinforcing...");
-
 				float required = threatendPlanet.GetMilitaryRequired();
 				float available = thisPlanet.GetMilitaryAvailable();
 				float amountToSend = Mathf.Min(available, required);
 
 				float rate = amountToSend / connectionDuration;
-				
-				thisPlanet.Connect(threatendPlanet, rate, Planet.Connection.Type.REINFORCE);
+
+				int tier = GameConfig.GetBestConnectionTier(rate);
+				if(tier >= 0)
+				{
+					thisPlanet.Connect(threatendPlanet, tier);
+				}
+			}
+			else
+			{
+				thisPlanet.SeverConnection();
 			}
 		}
 	}
-	
+
 	void TryAttack(List<Planet> planets)
 	{
 		if(thisPlanet.military.current > thisPlanet.threatLevel)
@@ -93,14 +106,20 @@ public class PlanetAI : MonoBehaviour
 					lowestUnits = planet.military.current;
 				}
 			}
-			if(bestTarget)
+			if(bestTarget != null)
 			{
-				Debug.Log("Attacking...");
-
 				float amountToSend = thisPlanet.GetMilitaryAvailable();
 				float rate = amountToSend / connectionDuration;
 
-				thisPlanet.Connect(bestTarget, rate, Planet.Connection.Type.ATTACK);
+				int tier = GameConfig.GetBestConnectionTier(rate);
+				if(tier >= 0)
+				{
+					thisPlanet.Connect(bestTarget, tier);
+				}
+			}
+			else
+			{
+				thisPlanet.SeverConnection();
 			}
 		}
 	}

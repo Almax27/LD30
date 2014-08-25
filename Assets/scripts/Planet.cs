@@ -7,26 +7,21 @@ public class Planet : MonoBehaviour
 	[System.Serializable]
 	public class Connection
 	{
-		public enum Type
-		{
-			ATTACK,
-			REINFORCE,
-			NONE
-		}
-
-		public Connection(Planet _sender, Planet _reciever, float _rate, Type _type)
+		public Connection(Planet _sender, Planet _reciever, int _tier)
 		{
 			sender = _sender;
 			reciever = _reciever;
-			rate = _rate;
-			type = _type;
+			tier = _tier;
 		}
 
 		public Planet sender = null;
 		public Planet reciever = null;
-		public float rate = 0; //units per second
-		public Type type = Type.NONE;
-	}  
+		public int tier = 0;
+
+		public float rate { get { return GameConfig.connectionTiers[tier]; } }
+
+		public void IncrementTier() { tier = (tier + 1) % GameConfig.connectionTiers.Length; }
+	}
 
 	//class to describe the state of a resource and encapsulate it's growth
 	[System.Serializable]
@@ -35,33 +30,56 @@ public class Planet : MonoBehaviour
 		public float max = 0;
 		public float current = 0;
 		public float baseGrowth = 0; //units per second
-		public float realGrowth = 0; //units per second
+		public float positiveGrowth = 0; //units per second
+		public float negativeGrowth = 0; //units per second
 
-		public void Update(float _dt)
+		//returns true if current has changed
+		public bool Update(float _dt)
 		{
-			current = Mathf.Min (max, current + realGrowth * _dt);
+			float units = Mathf.Clamp (current + ((baseGrowth + positiveGrowth - negativeGrowth) * _dt), 0, max);
+			if(units == current)
+			{
+				return false;
+			}
+			else
+			{
+				current = units;
+				return true;
+      		}
 		}
 	}
-
+#region public members
 	public int team = 0;
 	public Resource military = new Resource();
-
 	public float threatLevel = 0;
-
+	
 	public SphereCollider connectionArea = null;
-	
-	public TextMesh debugText = null;
+	public TextMesh unitText = null;
+  	public TextParticle textParticle = null;
+	public TextParticle textParticleLoss = null;
 	public Renderer debugRenderer = null;
-	
+#endregion
+
+#region protected members
+	protected ConnectionController connectionController = null;
+  	protected float resourceInterval = 1;
+  	protected float resourceTick = 0;
+
 	protected List<Connection> incommingConnections = new List<Connection>();
 	protected Connection outgoingConnection = null;
+#endregion
+
+#region public properties
 	public Connection OutgoingConnection { get { return outgoingConnection; } }
+	public static List<Planet> AllPlanets { get { return allPlanets; } }
+#endregion
 
 	static List<Planet> allPlanets = new List<Planet>();
 
 	void Awake()
 	{
 		allPlanets.Add(this);
+		connectionController = GetComponent<ConnectionController>();
 	}
 	void OnDestroy()
 	{
@@ -73,26 +91,14 @@ public class Planet : MonoBehaviour
 	{
 		List<Planet> planets = GetNearbyPlanets();
 		UpdateThreatLevel(planets);
+    	resourceTick = Random.Range(0.0f, 0.9f);
 	}
 
 	void Update()
 	{
 		List<Planet> planets = GetNearbyPlanets();
 		UpdateThreatLevel(planets);
-		UpdateResources(Time.fixedDeltaTime);
-
-		//handle 'death' and change to most agressive attacker's team
-		if(military.current < 0 && incommingConnections.Count > 0)
-		{
-			military.current = 0;
-			//sort in descending rate order
-			incommingConnections.Sort(delegate(Connection x, Connection y) 
-			                          {
-				return -x.rate.CompareTo(y.rate); //CompareTo sorts in ascending to we use '-' to reverse it
-			});
-			this.team = incommingConnections[0].sender.team;
-			this.SeverAllConnections();
-		}
+		UpdateResources(Time.deltaTime);
 
 		//DEBUG GUI STUFF
 		if(outgoingConnection != null)
@@ -100,24 +106,30 @@ public class Planet : MonoBehaviour
 			Vector3 senderPos = outgoingConnection.sender.transform.position;
 			Vector3 recieverPos = outgoingConnection.reciever.transform.position;
 			Vector3 lerpPoint = Vector3.Lerp(senderPos, recieverPos, 0.4f);
-			switch(outgoingConnection.type)
-			{
-			case Connection.Type.ATTACK:
-			{
-				Debug.DrawLine (senderPos, lerpPoint, Color.red);
-				break;
-			}
-			case Connection.Type.REINFORCE:
+
+			if(outgoingConnection.sender.team == outgoingConnection.reciever.team)
 			{
 				Debug.DrawLine (senderPos, lerpPoint, Color.blue);
-				break;
 			}
+			else
+			{
+				Debug.DrawLine (senderPos, lerpPoint, Color.red);
 			}
 		}
-		if(debugText)
+		if(unitText)
 		{
-			debugText.text = "U: " + ((int)military.current) + "  G: " + ((int)military.realGrowth) + "\n" +
-							 "C: " + (int)((outgoingConnection != null) ? outgoingConnection.rate : 0) + "  T: " + ((int)threatLevel) + "\n" ;
+			if((int)military.current == (int)military.max)
+			{
+				unitText.text = "[" + ((int)military.current).ToString() + "]";
+				unitText.color = Color.green;
+			}
+			else
+			{
+				float percent = military.current/military.max;
+				unitText.text = ((int)military.current).ToString();
+				unitText.color = Color.Lerp(Color.red, Color.green, percent);
+			}
+
 		}
 		if(debugRenderer)
 		{
@@ -183,16 +195,14 @@ public class Planet : MonoBehaviour
 
 	//create outgoing connection from this planet, will sever previous connection
 	//all connections must be made through this call to correctly maintain references
-	public void Connect(Planet _otherPlanet, float _rate, Connection.Type _type)
+	public void Connect(Planet _otherPlanet, int _tier)
 	{
 		//handle same target and type but new rate
-		if(outgoingConnection != null && 
-		   outgoingConnection.reciever == _otherPlanet && 
-		   outgoingConnection.type == _type && 
-		   outgoingConnection.rate != _rate)
+		if(outgoingConnection != null &&
+		   outgoingConnection.reciever == _otherPlanet &&
+		   outgoingConnection.tier != _tier)
 		{
-			outgoingConnection.rate = _rate;
-			OnConnectionChanged();
+			outgoingConnection.tier = _tier;
 			return;
 		}
 
@@ -200,9 +210,9 @@ public class Planet : MonoBehaviour
 		SeverConnection();
 
 		//create new connection
-		this.outgoingConnection = new Connection(this, _otherPlanet, _rate, _type);
+		this.outgoingConnection = new Connection(this, _otherPlanet, _tier);
 		_otherPlanet.incommingConnections.Add(this.outgoingConnection);
-		OnConnectionChanged();
+		connectionController.CreateConnection(outgoingConnection);
 	}
 
 	public void SeverConnection()
@@ -211,7 +221,7 @@ public class Planet : MonoBehaviour
 		{
 			this.outgoingConnection.reciever.incommingConnections.Remove(this.outgoingConnection);
 			this.outgoingConnection = null;
-			//TODO: destroy visualisation
+			connectionController.DestroyConnection();
 		}
 	}
 
@@ -225,34 +235,65 @@ public class Planet : MonoBehaviour
 		}
 	}
 
-	void OnConnectionChanged()
-	{
-		//TODO: create visualisation if == null
-		//TODO: update visualisation variables
-	}
-
 	//update and apply resource growth
 	void UpdateResources(float _dt)
 	{
 		//calculate effective growth rate based on incomming connections
-		military.realGrowth = military.baseGrowth;
+		military.positiveGrowth = 0;
+		military.negativeGrowth = 0;
+		if(outgoingConnection != null)
+		{
+			military.negativeGrowth += outgoingConnection.rate;
+		}
 		foreach(Connection connection in incommingConnections)
 		{
-			switch(connection.type)
+			if(connection.sender.team != connection.reciever.team)
 			{
-			case Connection.Type.ATTACK:
-			{
-				military.realGrowth -= connection.rate;
-				break;
+				military.negativeGrowth += connection.rate;
 			}
-			case Connection.Type.REINFORCE:
+			else
 			{
-				military.realGrowth += connection.rate;
-				break;
-			}
+				military.positiveGrowth += connection.rate;
 			}
 		}
 
-		military.Update(_dt);
+		resourceTick += Time.deltaTime;
+		if(resourceTick > resourceInterval)
+		{
+			resourceTick = 0;
+			military.Update(resourceInterval);
+			{
+				float growth = military.baseGrowth + military.positiveGrowth - military.negativeGrowth;
+				if(growth > 0)
+				{
+					textParticle.FirePositiveText("+" +  ((int)growth).ToString());
+				}
+				else if(growth < 0)
+				{
+					textParticleLoss.FireNegatveText(((int)growth).ToString());
+				}
+			}
+
+			//handle 'death' and change to most agressive attacker's team
+			if(military.current <= 0)
+			{
+				military.current = 0;
+
+				if(incommingConnections.Count > 0)
+				{
+					//sort in descending rate order
+					incommingConnections.Sort(delegate(Connection x, Connection y)
+					                          {
+						return -x.rate.CompareTo(y.rate); //CompareTo sorts in ascending to we use '-' to reverse it
+					});
+					this.team = incommingConnections[0].sender.team;
+					//this.SeverAllConnections();
+				}
+				else
+				{
+					this.SeverConnection();
+				}
+			}
+		}
 	}
 }

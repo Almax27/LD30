@@ -1,10 +1,11 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class PlayerController : MonoBehaviour 
+public class PlayerController : MonoBehaviour
 {
 	public LayerMask planetLayerMask;
 	public int team = 0;
+	public ConnectionLine connectionLine = null;
 
 	public Planet selectedPlanet = null;
 
@@ -12,13 +13,13 @@ public class PlayerController : MonoBehaviour
 	protected bool isPlacingConnection = false;
 
 	// Use this for initialization
-	void Start () 
+	void Start ()
 	{
-	
+
 	}
-	
+
 	// Update is called once per frame
-	void Update () 
+	void Update ()
 	{
 		if(Input.GetMouseButtonDown(0))
 		{
@@ -42,10 +43,18 @@ public class PlayerController : MonoBehaviour
 			if(Physics.Raycast(ray, out hitInfo, float.MaxValue, planetLayerMask))
 			{
 				Planet planet = hitInfo.collider.GetComponent<Planet>();
+
+				//if released on a different planet, attempt connection
 				if(planet != selectedPlanet)
 				{
 					SetConnection(selectedPlanet, planet);
 				}
+				//if released on the same planet, cycle connection tier
+				else if(selectedPlanet.OutgoingConnection != null)
+				{
+					selectedPlanet.OutgoingConnection.IncrementTier();
+				}
+
 			}
 			UnselectPlanet();
 			isPlacingConnection = false;
@@ -57,7 +66,6 @@ public class PlayerController : MonoBehaviour
 			isPlacingConnection = true;
 		}
 
-		//draw ray from camera
 		if(Input.GetMouseButton(0))
 		{
 			Plane xzPlane = new Plane(Vector3.up, Vector3.zero);
@@ -70,9 +78,21 @@ public class PlayerController : MonoBehaviour
 			Ray mouseRay = Camera.main.ScreenPointToRay(Input.mousePosition);
 			xzPlane.Raycast(mouseRay, out mouseDist);
 
+			if(connectionLine != null && isPlacingConnection)
+			{
+				connectionLine.lineStart = selectedPlanet.transform.position;
+				connectionLine.lineEnd = mouseRay.GetPoint(mouseDist);
+			}
+
+			//debug
 			Debug.DrawLine(mouseDownRay.origin, mouseDownRay.GetPoint(mouseDownDist), Color.white);
 			Debug.DrawLine(mouseRay.origin, mouseRay.GetPoint(mouseDist), Color.white);
 			Debug.DrawLine(mouseDownRay.GetPoint(mouseDownDist), mouseRay.GetPoint(mouseDist), Color.white);
+		}
+
+		if(connectionLine != null)
+		{
+			connectionLine.gameObject.SetActive(isPlacingConnection);
 		}
 	}
 
@@ -94,21 +114,22 @@ public class PlayerController : MonoBehaviour
 			selectedPlanet = null;
 		}
 	}
-	
+
 	void SetConnection(Planet from, Planet to)
 	{
 		//apply connection here
 		Debug.Log("Connection made: " + from.name + " -> " + to.name);
 		if(from.team != to.team)
 		{
-			from.Connect(to, 10, Planet.Connection.Type.ATTACK);
+			from.Connect(to, 0);
 		}
 		else
 		{
-			from.Connect(to, 10, Planet.Connection.Type.REINFORCE);
+			from.Connect(to, 0);
 		}
 	}
 
+	/*
 	//GUI space selection arrow
 	void OnGUI()
 	{
@@ -119,7 +140,8 @@ public class PlayerController : MonoBehaviour
 			Vector3 mousePos = GUIUtility.ScreenToGUIPoint( Input.mousePosition );
 			mousePos.y = Camera.main.pixelHeight - mousePos.y;
 
-			GuiHelper.DrawLine(planetPos, mousePos, Color.white);
+			GuiHelper.DrawLine(planetPos, mousePos, connectionLineTexture, 100);
 		}
 	}
+	*/
 }
