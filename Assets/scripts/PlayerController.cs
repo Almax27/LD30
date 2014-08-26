@@ -21,7 +21,7 @@ public class PlayerController : MonoBehaviour
 	// Update is called once per frame
 	void Update ()
 	{
-		if(Input.GetMouseButtonDown(0))
+		if(Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1))
 		{
 			Debug.Log("mouseDown: " + Input.mousePosition);
 			mouseDownPos = Input.mousePosition;
@@ -44,24 +44,45 @@ public class PlayerController : MonoBehaviour
 			{
 				Planet planet = hitInfo.collider.GetComponent<Planet>();
 
-				//if released on a different planet, attempt connection
-				if(planet != selectedPlanet)
+				if(Vector3.Distance(selectedPlanet.transform.position, planet.transform.position) < selectedPlanet.connectionArea.radius)
 				{
-					SetConnection(selectedPlanet, planet);
+					//if released on a different planet, attempt connection
+					if(planet != selectedPlanet)
+					{
+						SetConnection(selectedPlanet, planet);
+					}
+					//if released on the same planet, cycle connection tier
+					else if(selectedPlanet.OutgoingConnection != null)
+					{
+						selectedPlanet.OutgoingConnection.IncrementTier();
+					}
 				}
-				//if released on the same planet, cycle connection tier
-				else if(selectedPlanet.OutgoingConnection != null)
+				else
 				{
-					selectedPlanet.OutgoingConnection.IncrementTier();
+					selectedPlanet.SeverConnection();
 				}
-
+			}
+			else
+			{
+				selectedPlanet.SeverConnection();
 			}
 			UnselectPlanet();
 			isPlacingConnection = false;
 		}
+		else if(Input.GetMouseButtonUp(1) && selectedPlanet != null)
+		{
+			Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+			RaycastHit hitInfo;
+			if(Physics.Raycast(ray, out hitInfo, float.MaxValue, planetLayerMask))
+			{
+				selectedPlanet.SeverConnection();
+				UnselectPlanet();
+				isPlacingConnection = false;
+			}
+		}
 
 		float deadZone = 5;
-		if(!isPlacingConnection && selectedPlanet && Vector2.Distance(mouseDownPos, Input.mousePosition) > deadZone)
+		if(!isPlacingConnection && selectedPlanet && Input.GetMouseButton(0) && Vector2.Distance(mouseDownPos, Input.mousePosition) > deadZone)
 		{
 			isPlacingConnection = true;
 		}
@@ -80,8 +101,20 @@ public class PlayerController : MonoBehaviour
 
 			if(connectionLine != null && isPlacingConnection)
 			{
+				connectionLine.gameObject.SetActive(true);
+
 				connectionLine.lineStart = selectedPlanet.transform.position;
 				connectionLine.lineEnd = mouseRay.GetPoint(mouseDist);
+
+				connectionLine.SendMessage("Update");
+
+				//clamp length
+				Vector3 dist = connectionLine.lineEnd - connectionLine.lineStart;
+				if(dist.sqrMagnitude > selectedPlanet.connectionArea.radius * selectedPlanet.connectionArea.radius)
+				{
+					dist = dist.normalized * selectedPlanet.connectionArea.radius;
+					connectionLine.lineEnd = connectionLine.lineStart + dist;
+				}
 			}
 
 			//debug

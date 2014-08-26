@@ -48,7 +48,7 @@ public class ConnectionLine : MonoBehaviour
 			textureOffset_2.x -= textureAnimRate_2 * Time.deltaTime * (connection.tier+0.5f);
 			line.material.SetTextureOffset("_FlowTex2", textureOffset_2);
 
-			if(connection.sender.team == connection.reciever.team)
+			if(connection.sender.team == 0)
 			{
 				line.material.color = Color.green;
 			}

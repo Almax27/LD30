@@ -1,4 +1,4 @@
-﻿Shader "Unlit/Transparent Tint"
+﻿Shader "Custom/Connection"
 {
     Properties
     {

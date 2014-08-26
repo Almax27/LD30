@@ -28,15 +28,22 @@ public class PlanetAI : MonoBehaviour
 		if(connectionTick > connectionDuration)
 		{
 			connectionTick = 0;
+
+			List<Planet> teamPlanets = new List<Planet>();
 			for(int i = 0; i < Planet.AllPlanets.Count; i++)
 			{
-				thisPlanet = Planet.AllPlanets[i];
-				if(thisPlanet.team == team)
-				{	
-					if(Random.value < 0.2f) //randomly don't do anything
-					{
-						UpdateConnection();
-					}
+				if(Planet.AllPlanets[i].team == team)
+				{
+					teamPlanets.Add(Planet.AllPlanets[i]);
+				}
+			}
+
+			for(int i = 0; i < teamPlanets.Count; i++)
+			{
+				thisPlanet = teamPlanets[i]; //TODO: pass this down
+				if(Random.value < (Planet.AllPlanets.Count * 0.3f) / teamPlanets.Count) //randomly don't do anything
+				{
+					UpdateConnection();
 				}
 			}
 		}
@@ -45,19 +52,18 @@ public class PlanetAI : MonoBehaviour
 	void UpdateConnection()
 	{
 		List<Planet> planets = thisPlanet.GetNearbyPlanets();
-		if(Random.value > 0.5f)
+		if(TryReinforce(planets) == false)
 		{
-			TryAttack(planets);
-		}
-		else
-		{
-			TryReinforce(planets);
+			if(TryAttack(planets) == false)
+			{
+				thisPlanet.SeverConnection();
+			}
 		}
 	}
 
-	void TryReinforce(List<Planet> planets)
+	bool TryReinforce(List<Planet> planets)
 	{
-		if(thisPlanet.military.current > thisPlanet.threatLevel)
+		//if(thisPlanet.military.current > thisPlanet.threatLevel)
 		{
 			Planet threatendPlanet = null;
 			float highestThreat = thisPlanet.threatLevel;
@@ -83,24 +89,27 @@ public class PlanetAI : MonoBehaviour
 				{
 					thisPlanet.Connect(threatendPlanet, tier);
 				}
-			}
-			else
-			{
-				thisPlanet.SeverConnection();
+				return true;
 			}
 		}
+		return false;
 	}
 
-	void TryAttack(List<Planet> planets)
+	bool TryAttack(List<Planet> planets)
 	{
-		if(thisPlanet.military.current > thisPlanet.threatLevel)
+		//if(thisPlanet.military.current > thisPlanet.threatLevel)
 		{
 			Planet bestTarget = null;
+			//default to current target
+			if(thisPlanet.OutgoingConnection != null)
+			{
+				bestTarget = thisPlanet.OutgoingConnection.reciever;
+			}
 			float lowestUnits = float.MaxValue;
 			for(int i = 0; i < planets.Count; i++)
 			{
 				Planet planet = planets[i];
-				if(planet.team != thisPlanet.team && planet.military.current < lowestUnits)
+				if((planet.team < 0 || planet.team != thisPlanet.team) && planet.military.current < lowestUnits)
 				{
 					bestTarget = planet;
 					lowestUnits = planet.military.current;
@@ -115,12 +124,10 @@ public class PlanetAI : MonoBehaviour
 				if(tier >= 0)
 				{
 					thisPlanet.Connect(bestTarget, tier);
+					return true;
 				}
 			}
-			else
-			{
-				thisPlanet.SeverConnection();
-			}
 		}
+		return false;
 	}
 }

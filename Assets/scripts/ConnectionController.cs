@@ -13,6 +13,10 @@ public class ConnectionController : MonoBehaviour
 
 	}
 
+	void OnDestroy()
+	{
+	}
+
 	void Update()
 	{
 
@@ -26,6 +30,7 @@ public class ConnectionController : MonoBehaviour
 		if(_connection != null)
 		{
 			GameObject gobj = GameObject.Instantiate(connectionLinePrefab.gameObject) as GameObject;
+			gobj.transform.parent = this.transform;
 			currentLine = gobj.GetComponent<ConnectionLine>();
 			currentLine.Connect(_connection);
 		}

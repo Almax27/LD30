@@ -34,9 +34,9 @@ public class Planet : MonoBehaviour
 		public float negativeGrowth = 0; //units per second
 
 		//returns true if current has changed
-		public bool Update(float _dt)
+		public bool Update(float _dt, bool _allowBaseGrowth)
 		{
-			float units = Mathf.Clamp (current + ((baseGrowth + positiveGrowth - negativeGrowth) * _dt), 0, max);
+			float units = Mathf.Clamp (current + (((_allowBaseGrowth ? baseGrowth : 0.0f) + positiveGrowth - negativeGrowth) * _dt), 0.0f, max);
 			if(units == current)
 			{
 				return false;
@@ -57,7 +57,11 @@ public class Planet : MonoBehaviour
 	public TextMesh unitText = null;
   	public TextParticle textParticle = null;
 	public TextParticle textParticleLoss = null;
-	public Renderer debugRenderer = null;
+
+	public GameObject[] planetModelPrefabs = new GameObject[0];
+	public GameObject currentModel = null;
+	public Vector3 modelRotAxis = Vector3.zero;
+	public RingController ring = null;
 #endregion
 
 #region protected members
@@ -92,6 +96,13 @@ public class Planet : MonoBehaviour
 		List<Planet> planets = GetNearbyPlanets();
 		UpdateThreatLevel(planets);
     	resourceTick = Random.Range(0.0f, 0.9f);
+
+		//pick a random skin
+		RandomiseSkin();
+
+		float axisDevience = 0.1f;
+		modelRotAxis = new Vector3(0, Random.Range(-axisDevience,axisDevience), 1);
+		modelRotAxis.Normalize();
 	}
 
 	void Update()
@@ -131,9 +142,14 @@ public class Planet : MonoBehaviour
 			}
 
 		}
-		if(debugRenderer)
+		if(currentModel != null)
 		{
-			debugRenderer.material.color = team == 0 ? Color.blue : Color.red;
+			currentModel.transform.Rotate(modelRotAxis, 20 * Time.deltaTime);
+		}
+
+		if(ring != null)
+		{
+			ring.SetTeam(team);
 		}
 	}
 
@@ -143,6 +159,29 @@ public class Planet : MonoBehaviour
 		military.baseGrowth = Random.Range(5.0f, 10.0f);
 		military.max = Random.Range(50, 200);
 		military.current = (int)Random.Range(military.max * 0.25f, military.max * 0.5f);
+	}
+
+	[ContextMenu("RandomSkin")]
+	void RandomiseSkin()
+	{
+		if(planetModelPrefabs.Length == 0)
+		{
+			Debug.LogError("Failed to randomise planet skin: No models given");
+			return;
+		}
+
+		//destroy current
+		if(currentModel != null)
+		{
+			DestroyImmediate(currentModel);
+			currentModel = null;
+		}
+		//create new
+		currentModel = GameObject.Instantiate(planetModelPrefabs[Random.Range(0,planetModelPrefabs.Length)]) as GameObject;
+		currentModel.transform.parent = this.transform;
+		currentModel.transform.localPosition = Vector3.zero;
+
+		currentModel.transform.Rotate(Random.Range(0.0f,360.0f),Random.Range(0.0f,360.0f),Random.Range(0.0f,360.0f));
 	}
 
 	//TODO: optimise use, once per frame and access cache?
@@ -165,8 +204,8 @@ public class Planet : MonoBehaviour
 
 	public float GetMilitaryAvailable()
 	{
-		float desired = Mathf.Max (0.0f, (military.current - threatLevel));
-		return Mathf.Min (desired, military.current) * Random.Range(0.5f,0.6f); //can't spend more than you have
+		float available = Mathf.Max (0.0f, (military.current - threatLevel));
+		return Mathf.Min (available, military.current); //can't spend more than you have
 	}
 
 	public float GetMilitaryRequired()
@@ -182,15 +221,23 @@ public class Planet : MonoBehaviour
 		for(int i = 0; i < planets.Count; i++)
 		{
 			Planet planet = planets[i];
+
+			float delta = 0;
 			if(planet.team != this.team)
 			{
-				threatLevel += planet.military.current;
+				delta += planet.military.current * 0.5f;// * Random.Range(0.5f,1.0f);
 			}
 			else
 			{
-				threatLevel -= planet.military.current * 0.8f;
+				delta -= planet.military.current * 0.5f;// * Random.Range(0.5f,1.0f);
 			}
+			if(planet.team < 0)
+			{
+				delta *= 0.1f;
+			}
+			threatLevel += delta;
 		}
+		threatLevel = Mathf.Max(0, threatLevel);
 	}
 
 	//create outgoing connection from this planet, will sever previous connection
@@ -199,8 +246,7 @@ public class Planet : MonoBehaviour
 	{
 		//handle same target and type but new rate
 		if(outgoingConnection != null &&
-		   outgoingConnection.reciever == _otherPlanet &&
-		   outgoingConnection.tier != _tier)
+		   outgoingConnection.reciever == _otherPlanet)
 		{
 			outgoingConnection.tier = _tier;
 			return;
@@ -243,7 +289,7 @@ public class Planet : MonoBehaviour
 		military.negativeGrowth = 0;
 		if(outgoingConnection != null)
 		{
-			military.negativeGrowth += outgoingConnection.rate;
+			military.negativeGrowth += Mathf.Max(0, outgoingConnection.rate);
 		}
 		foreach(Connection connection in incommingConnections)
 		{
@@ -261,7 +307,7 @@ public class Planet : MonoBehaviour
 		if(resourceTick > resourceInterval)
 		{
 			resourceTick = 0;
-			military.Update(resourceInterval);
+			if(military.Update(resourceInterval, this.team >= 0))
 			{
 				float growth = military.baseGrowth + military.positiveGrowth - military.negativeGrowth;
 				if(growth > 0)
@@ -289,10 +335,7 @@ public class Planet : MonoBehaviour
 					this.team = incommingConnections[0].sender.team;
 					//this.SeverAllConnections();
 				}
-				else
-				{
-					this.SeverConnection();
-				}
+				this.SeverConnection();
 			}
 		}
 	}
