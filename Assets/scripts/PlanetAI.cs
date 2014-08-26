@@ -47,7 +47,7 @@ public class PlanetAI : MonoBehaviour
 					UpdateConnection();
 				}
 			}*/
-			int moveCount = 1;
+			int moveCount = 2;
 			List<int> moves = new List<int>();
 			for(int i = 0; i < moveCount && i < teamPlanets.Count; i++)
 			{
@@ -96,8 +96,9 @@ public class PlanetAI : MonoBehaviour
 				float amountToSend = Mathf.Min(available, required);
 
 				float rate = amountToSend / connectionDuration;
+				rate += thisPlanet.military.baseGrowth + thisPlanet.military.positiveGrowth;
 
-				int tier = GameConfig.GetBestConnectionTier(rate);
+				int tier = GameConfig.GetBestConnectionTier(rate * Random.Range(0.5f,1.0f));
 				if(tier >= 0)
 				{
 					thisPlanet.Connect(threatendPlanet, tier);
@@ -132,8 +133,9 @@ public class PlanetAI : MonoBehaviour
 			{
 				float amountToSend = thisPlanet.GetMilitaryAvailable();
 				float rate = amountToSend / connectionDuration;
+				rate += thisPlanet.military.baseGrowth + thisPlanet.military.positiveGrowth;
 
-				int tier = GameConfig.GetBestConnectionTier(rate);
+				int tier = GameConfig.GetBestConnectionTier(rate * Random.Range(0.5f,1.0f));
 				if(tier >= 0)
 				{
 					thisPlanet.Connect(bestTarget, tier);

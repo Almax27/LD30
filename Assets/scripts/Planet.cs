@@ -281,17 +281,23 @@ public class Planet : MonoBehaviour
 		military.negativeGrowth = 0;
 		if(outgoingConnection != null)
 		{
-			military.negativeGrowth += Mathf.Max(0, outgoingConnection.rate);
+			if(outgoingConnection.sender.military.current > 0)
+			{
+				military.negativeGrowth += Mathf.Max(0, outgoingConnection.rate);
+			}
 		}
 		foreach(Connection connection in incommingConnections)
 		{
-			if(connection.sender.team != connection.reciever.team)
+			if(connection.sender.military.current > 0)
 			{
-				military.negativeGrowth += connection.rate;
-			}
-			else
-			{
-				military.positiveGrowth += connection.rate;
+				if(connection.sender.team != connection.reciever.team)
+				{
+					military.negativeGrowth += connection.rate;
+				}
+				else
+				{
+					military.positiveGrowth += connection.rate;
+				}
 			}
 		}
 
@@ -324,10 +330,12 @@ public class Planet : MonoBehaviour
 					                          {
 						return -x.rate.CompareTo(y.rate); //CompareTo sorts in ascending to we use '-' to reverse it
 					});
-					this.team = incommingConnections[0].sender.team;
-					//this.SeverAllConnections();
+					if(this.team != incommingConnections[0].sender.team)
+					{
+						this.team = incommingConnections[0].sender.team;
+						this.SeverConnection();
+					}
 				}
-				this.SeverConnection();
 			}
 		}
 	}

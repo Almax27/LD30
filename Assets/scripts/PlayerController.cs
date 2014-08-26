@@ -154,11 +154,11 @@ public class PlayerController : MonoBehaviour
 		Debug.Log("Connection made: " + from.name + " -> " + to.name);
 		if(from.team != to.team)
 		{
-			from.Connect(to, 0);
+			from.Connect(to, 1);
 		}
 		else
 		{
-			from.Connect(to, 0);
+			from.Connect(to, 1);
 		}
 	}
 
