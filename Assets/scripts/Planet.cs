@@ -204,7 +204,7 @@ public class Planet : MonoBehaviour
 
 	public float GetMilitaryAvailable()
 	{
-		float available = Mathf.Max (0.0f, (military.current - threatLevel));
+		float available = Mathf.Max (0.0f, (military.current - threatLevel)) * Random.Range(0.5f,3.0f);
 		return Mathf.Min (available, military.current); //can't spend more than you have
 	}
 
@@ -225,15 +225,7 @@ public class Planet : MonoBehaviour
 			float delta = 0;
 			if(planet.team != this.team)
 			{
-				delta += planet.military.current * 0.5f;// * Random.Range(0.5f,1.0f);
-			}
-			else
-			{
-				delta -= planet.military.current * 0.5f;// * Random.Range(0.5f,1.0f);
-			}
-			if(planet.team < 0)
-			{
-				delta *= 0.1f;
+				delta += planet.military.current * 0.8f;// * Random.Range(0.5f,1.0f);
 			}
 			threatLevel += delta;
 		}

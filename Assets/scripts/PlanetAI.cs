@@ -38,11 +38,24 @@ public class PlanetAI : MonoBehaviour
 				}
 			}
 
+			/*
 			for(int i = 0; i < teamPlanets.Count; i++)
 			{
 				thisPlanet = teamPlanets[i]; //TODO: pass this down
-				if(Random.value < (Planet.AllPlanets.Count * 0.3f) / teamPlanets.Count) //randomly don't do anything
+				if(Random.value*2.0f > teamPlanets.Count / Planet.AllPlanets.Count) //randomly don't do anything				
 				{
+					UpdateConnection();
+				}
+			}*/
+			int moveCount = 1;
+			List<int> moves = new List<int>();
+			for(int i = 0; i < moveCount && i < teamPlanets.Count; i++)
+			{
+				int move = Random.Range(0,teamPlanets.Count);
+				if(moves.Contains(move) == false)
+				{
+					moves.Add(move);
+					thisPlanet = teamPlanets[move];
 					UpdateConnection();
 				}
 			}
@@ -52,9 +65,9 @@ public class PlanetAI : MonoBehaviour
 	void UpdateConnection()
 	{
 		List<Planet> planets = thisPlanet.GetNearbyPlanets();
-		if(TryReinforce(planets) == false)
+		if(TryAttack(planets) == false)
 		{
-			if(TryAttack(planets) == false)
+			if(TryReinforce(planets) == false)
 			{
 				thisPlanet.SeverConnection();
 			}
